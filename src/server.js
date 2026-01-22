@@ -1,14 +1,17 @@
 import express from 'express';
-import Router from './routes/movieroutes.js';
+import movieRoutes from './routes/movieroutes.js';
 import {config} from 'dotenv';
 import { connectDB, disconnectDB} from './config/db.js';
+import authRoutes from './routes/authRoutes.js';
+import prisma from './config/db.js';
 
 config();
 connectDB();
 const app = express();
 const port = 5001;
 
-app.use('/movies', Router);
+app.use('/movies', movieRoutes);
+app.use('/auth', authRoutes);
 
 app.listen(port, () => {
     console.log('server is runninf on port ' + port);
