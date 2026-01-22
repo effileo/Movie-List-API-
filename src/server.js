@@ -1,7 +1,7 @@
 import express from 'express';
 import movieRoutes from './routes/movieroutes.js';
-import {config} from 'dotenv';
-import { connectDB, disconnectDB} from './config/db.js';
+import { config } from 'dotenv';
+import { connectDB, disconnectDB } from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import prisma from './config/db.js';
 
@@ -10,12 +10,15 @@ connectDB();
 const app = express();
 const port = 5001;
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use('/movies', movieRoutes);
 app.use('/auth', authRoutes);
 
 app.listen(port, () => {
     console.log('server is runninf on port ' + port);
-}) 
+})
 
 process.on('unhandledRejection', async (err) => {
     console.error('Unhandled Rejection:', err);
