@@ -50,6 +50,13 @@ if (!isValid){
             message: "invalid credentials!"
         })
 }
-
+res.status(201).json({
+        status: "success",
+        data: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+        }
+    });
 
 export { register, login };
