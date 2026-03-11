@@ -33,4 +33,16 @@ const register = async (req, res) => {
     });
 };
 
-export { register };
+const login = async (req, res) => {
+    const {email, password} = req.body;
+    const user = await prisma.user.findUniques({
+        where:{email: email}
+    })
+    if (!user){
+        return res.status(400).json({
+            message: "invalid credentials!"
+        })
+    }
+}
+
+export { register, login };
