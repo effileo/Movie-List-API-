@@ -65,7 +65,18 @@ const login = async (req, res) => {
         },
         token,
     });
-
+  
 };
+const logout = async (req, res) =>{
+    res.cookie("jwt", "",{
+        expires: new Date(0),
+        httpOnly: true,   
+    })
+    res.status(200).json({
+        status: "success",
+        message: "Logged out successfully"
+    })
+        
+    }
 
-export { register, login };
+export { register, login, logout };
