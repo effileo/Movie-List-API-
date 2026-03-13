@@ -1,119 +1,121 @@
-import { PrismaClient } from "@prisma/client";
+import { Pool } from "pg";
+import { PrismaPg } from "@prisma/adapter-pg";
+import pkg from "@prisma/client";
+import dotenv from "dotenv";
 
-const prisma = PrismaClient();
-const creatorID= "2"
+const { PrismaClient } = pkg;
+dotenv.config();
+
+const connectionString = process.env.DATABASE_URL;
+const pool = new Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
+const userId = 3;
 
 const movies = [
   {
     title: "The Matrix",
-    overview: "A computer hacker learns about the true nature of reality.",
-    releaseYear: 1999,
-    genres: ["Action", "Sci-Fi"],
-    runtime: 136,
-    posterUrl: "https://example.com/matrix.jpg",
+    Overview: "A computer hacker learns about the true nature of reality.",
+    year: 1999,
+    genre: ["Action", "Sci-Fi"],
+    runTime: 136,
     createdBy: userId,
   },
   {
     title: "Inception",
-    overview:
+    Overview:
       "A thief who steals corporate secrets through dream-sharing technology.",
-    releaseYear: 2010,
-    genres: ["Action", "Sci-Fi", "Thriller"],
-    runtime: 148,
-    posterUrl: "https://example.com/inception.jpg",
+    year: 2010,
+    genre: ["Action", "Sci-Fi", "Thriller"],
+    runTime: 148,
     createdBy: userId,
   },
   {
     title: "The Dark Knight",
-    overview: "Batman faces the Joker in a battle for Gotham's soul.",
-    releaseYear: 2008,
-    genres: ["Action", "Crime", "Drama"],
-    runtime: 152,
-    posterUrl: "https://example.com/darkknight.jpg",
+    Overview: "Batman faces the Joker in a battle for Gotham's soul.",
+    year: 2008,
+    genre: ["Action", "Crime", "Drama"],
+    runTime: 152,
     createdBy: userId,
   },
   {
     title: "Pulp Fiction",
-    overview: "The lives of two mob hitmen, a boxer, and others intertwine.",
-    releaseYear: 1994,
-    genres: ["Crime", "Drama"],
-    runtime: 154,
-    posterUrl: "https://example.com/pulpfiction.jpg",
+    Overview: "The lives of two mob hitmen, a boxer, and others intertwine.",
+    year: 1994,
+    genre: ["Crime", "Drama"],
+    runTime: 154,
     createdBy: userId,
   },
   {
     title: "Interstellar",
-    overview: "A team of explorers travel through a wormhole in space.",
-    releaseYear: 2014,
-    genres: ["Adventure", "Drama", "Sci-Fi"],
-    runtime: 169,
-    posterUrl: "https://example.com/interstellar.jpg",
+    Overview: "A team of explorers travel through a wormhole in space.",
+    year: 2014,
+    genre: ["Adventure", "Drama", "Sci-Fi"],
+    runTime: 169,
     createdBy: userId,
   },
   {
     title: "The Shawshank Redemption",
-    overview: "Two imprisoned men bond over a number of years.",
-    releaseYear: 1994,
-    genres: ["Drama"],
-    runtime: 142,
-    posterUrl: "https://example.com/shawshank.jpg",
+    Overview: "Two imprisoned men bond over a number of years.",
+    year: 1994,
+    genre: ["Drama"],
+    runTime: 142,
     createdBy: userId,
   },
   {
     title: "Fight Club",
-    overview:
+    Overview:
       "An insomniac office worker and a devil-may-care soapmaker form an underground fight club.",
-    releaseYear: 1999,
-    genres: ["Drama"],
-    runtime: 139,
-    posterUrl: "https://example.com/fightclub.jpg",
+    year: 1999,
+    genre: ["Drama"],
+    runTime: 139,
     createdBy: userId,
   },
   {
     title: "Forrest Gump",
-    overview:
+    Overview:
       "The presidencies of Kennedy and Johnson unfold through the perspective of an Alabama man.",
-    releaseYear: 1994,
-    genres: ["Drama", "Romance"],
-    runtime: 142,
-    posterUrl: "https://example.com/forrestgump.jpg",
+    year: 1994,
+    genre: ["Drama", "Romance"],
+    runTime: 142,
     createdBy: userId,
   },
   {
     title: "The Godfather",
-    overview:
+    Overview:
       "The aging patriarch of an organized crime dynasty transfers control to his son.",
-    releaseYear: 1972,
-    genres: ["Crime", "Drama"],
-    runtime: 175,
-    posterUrl: "https://example.com/godfather.jpg",
+    year: 1972,
+    genre: ["Crime", "Drama"],
+    runTime: 175,
     createdBy: userId,
   },
   {
     title: "Goodfellas",
-    overview: "The story of Henry Hill and his life in the mob.",
-    releaseYear: 1990,
-    genres: ["Biography", "Crime", "Drama"],
-    runtime: 146,
-    posterUrl: "https://example.com/goodfellas.jpg",
+    Overview: "The story of Henry Hill and his life in the mob.",
+    year: 1990,
+    genre: ["Biography", "Crime", "Drama"],
+    runTime: 146,
     createdBy: userId,
   },
 ];
- 
-const main = async()=>{
-    console.log("seeding started...");
-    for (const movie of movies){
-        await prisma.movie.create({
-            data: movie,
-        })
-     console.log('movie created:'+ movie.title);
-    }
-    console.log("seeding completed.");
-}
 
-main().catch((err)=>{
+const main = async () => {
+  console.log("seeding started...");
+  for (const movie of movies) {
+    await prisma.movie.create({
+      data: movie,
+    });
+    console.log("movie created: " + movie.title);
+  }
+  console.log("seeding completed.");
+};
+
+main()
+  .catch((err) => {
     console.error(err);
     process.exit(1);
-}).finally(async()=>{
+  })
+  .finally(async () => {
     await prisma.$disconnect();
-})
+    await pool.end();
+  });
