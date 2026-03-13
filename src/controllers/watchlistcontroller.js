@@ -20,7 +20,7 @@ const existingInWatchlist = await prisma.watchlistItem.findUnique({
         }
     }
 });
-if (!existingInWatchlist){
+if (existingInWatchlist){
     return res.status(400).json({
         error: "movie already in watchlist."
     })
