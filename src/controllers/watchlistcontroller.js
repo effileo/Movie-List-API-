@@ -6,5 +6,10 @@ const movieExist = await prisma.movie.findUnique({
     where: {
         id: movieID,
     }
-})
+}); 
+if (!movieExist){
+    return res.status(404).json({
+        error: "movie not found"
+    });
+}
 }
