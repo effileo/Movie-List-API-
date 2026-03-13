@@ -39,3 +39,4 @@ res.status(201).json({
     data: watchlistItem,
 })
 }
+export {addToWatchList}

@@ -4,6 +4,7 @@ import { config } from 'dotenv';
 import { connectDB, disconnectDB } from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import prisma from './config/db.js';
+import watchlistRoutes from './routes/watchlistRoutes.js';  
 
 config();
 connectDB();
@@ -15,6 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/movies', movieRoutes);
 app.use('/auth', authRoutes);
+app.use('/watchlist', watchlistRoutes);
 
 app.listen(port, () => {
     console.log('server is runninf on port ' + port);
