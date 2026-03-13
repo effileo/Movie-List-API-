@@ -24,5 +24,18 @@ if (!existingInWatchlist){
     return res.status(400).json({
         error: "movie already in watchlist."
     })
-}
+};
+const watchlistItem = await prisma.watchlistItem.create({
+    data:{
+        userId,
+        movieId: movieId,
+        status: status || "PLANNED",
+        rating,
+        notes,
+    }
+});
+res.status(201).json({
+    status: "success",
+    data: watchlistItem,
+})
 }
