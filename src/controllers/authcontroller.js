@@ -8,6 +8,7 @@ const register = async (req, res) => {
             email: email,
         }
     });
+    // check if the user already exists  
     if (userExist) {
         return res.status(400).json({
             message: "user already exists"
