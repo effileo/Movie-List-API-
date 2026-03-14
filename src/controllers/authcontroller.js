@@ -25,6 +25,7 @@ const register = async (req, res) => {
             },
         }
     );
+    // generate a token for the user and send it in the response
     const token = generateToken(user.id, res);
     res.status(201).json({
         status: "success",
