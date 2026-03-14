@@ -12,6 +12,7 @@ if (!movieExist){
         error: "movie not found"
     });
 }
+
 const existingInWatchlist = await prisma.watchlistItem.findUnique({
     where: {
         userId_movieId: {
@@ -20,6 +21,7 @@ const existingInWatchlist = await prisma.watchlistItem.findUnique({
         }
     }
 });
+// check if the movie is already in the user's watchlist
 if (existingInWatchlist){
     return res.status(400).json({
         error: "movie already in watchlist."
