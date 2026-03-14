@@ -30,8 +30,6 @@ const watchlistItem = await prisma.watchlistItem.create({
         userId,
         movieId: movieId,
         status: status || "PLANNED",
-        rating,
-        notes,
     }
 });
 res.status(201).json({
