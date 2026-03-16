@@ -6,7 +6,7 @@ const addToWatchList = (prisma) => async (req, res) => {
     if (!prisma?.movie) {
         return res.status(503).json({ error: "Database client not ready" });
     }
-    const { movieId, status, rating, notes, userId } = req.body;
+    const { movieId, status, rating, notes, } = req.body;
     // verify movie exists in the movie table
     const movieExist = await prisma.movie.findUnique({
     where: {
@@ -23,7 +23,7 @@ if (!movieExist){
 const existingInWatchlist = await prisma.watchListItem.findUnique({
     where: {
         userId_movieId: {
-            userId: Number(userId),
+            userId: Number(req.user.id),
             movieId,
         }
     }
@@ -36,7 +36,7 @@ if (existingInWatchlist){
 };
 const watchlistItem = await prisma.watchListItem.create({
     data: {
-        userId: Number(userId),
+        userId: Number(req.user.id),
         movieId,
         status: status || "PLANNED",
         rating: rating != null && rating !== '' ? Math.round(Number(rating)) : undefined,
