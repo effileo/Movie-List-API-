@@ -1,5 +1,5 @@
 import express from 'express';
-import { addToWatchList, deleteFromWatchlist } from '../controllers/watchlistcontroller.js';
+import { addToWatchList, deleteFromWatchlist, updateWatchlistItem  } from '../controllers/watchlistcontroller.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 
 /**
@@ -12,6 +12,7 @@ function watchlistRoutes(prisma) {
 
     router.post('/', addToWatchList(prisma));
     router.delete('/:id', deleteFromWatchlist(prisma));
+    router.put('/:id', updateWatchlistItem(prisma));
     return router;
 }
 
