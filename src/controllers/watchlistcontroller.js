@@ -61,7 +61,10 @@ const deleteFromWatchlist = (prisma) => async (req, res) => {
     await prisma.watchListItem.delete({
         where: { id: req.params.id }
     });
-    return res.status(204).send();
+    return res.status(200).json({
+        status: "success",
+        message: "item deleted successfully"
+    })
 };
 
 export { addToWatchList, deleteFromWatchlist };
