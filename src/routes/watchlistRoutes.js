@@ -1,5 +1,6 @@
 import express from 'express';
 import { addToWatchList } from '../controllers/watchlistcontroller.js';
+import authMiddleware from '../middleware/authMiddleware.js';
 
 /**
  * Prisma is passed from server.js so we use the same connected instance.
@@ -7,6 +8,8 @@ import { addToWatchList } from '../controllers/watchlistcontroller.js';
  */
 function watchlistRoutes(prisma) {
     const router = express.Router();
+    router.use(authMiddleware);
+
     router.post('/', addToWatchList(prisma));
     return router;
 }
