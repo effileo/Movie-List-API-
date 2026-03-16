@@ -69,16 +69,33 @@ const login = async (req, res) => {
     });
   
 };
-const logout = async (req, res) =>{
-    res.cookie("jwt", "",{
+const logout = async (req, res) => {
+    res.cookie("jwt", "", {
         expires: new Date(0),
-        httpOnly: true,   
-    })
+        httpOnly: true,
+    });
     res.status(200).json({
         status: "success",
         message: "Logged out successfully"
-    })
-        
-    }
+    });
+};
 
-export { register, login, logout };
+/** GET /auth/me – return current user (no password). Requires auth. */
+const getMe = async (req, res) => {
+    const user = req.user;
+    if (!user) {
+        return res.status(401).json({ error: "Not authorized" });
+    }
+    res.status(200).json({
+        status: "success",
+        data: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+        },
+    });
+};
+
+export { register, login, logout, getMe };
