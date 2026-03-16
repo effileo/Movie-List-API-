@@ -48,4 +48,20 @@ res.status(201).json({
     data: watchlistItem,
 })
 }
-export {addToWatchList}
+const deleteFromWatchlist = (prisma) => async (req, res) => {
+    const watchlistItem = await prisma.watchListItem.findUnique({
+        where: { id: req.params.id }
+    });
+    if (!watchlistItem) {
+        return res.status(404).json({ error: "watchlist item not found" });
+    }
+    if (watchlistItem.userId !== Number(req.user.id)) {
+        return res.status(403).json({ error: "you are forbidden to change this item" });
+    }
+    await prisma.watchListItem.delete({
+        where: { id: req.params.id }
+    });
+    return res.status(204).send();
+};
+
+export { addToWatchList, deleteFromWatchlist };
