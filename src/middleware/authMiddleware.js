@@ -11,5 +11,10 @@ const authMiddleware = async ()=>{
 else if (req.cookies.token){
     token = req.cookies.token;
 }
+if (!token){
+    return res.status(401).json({
+        error: "Not authorized, no token"
+    })
+}
 };
 export default authMiddleware;
