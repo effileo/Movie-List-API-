@@ -1,5 +1,5 @@
 import express from 'express';
-import movieRoutes from './routes/movieroutes.js';
+import movieRoutes from './routes/movieRoutes.js';
 import { config } from 'dotenv';
 import { connectDB, disconnectDB } from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
@@ -7,7 +7,7 @@ import prisma from './config/db.js';
 import watchlistRoutes from './routes/watchlistRoutes.js';  
 
 config();
-connectDB();
+
 const app = express();
 const port = 5001;
 
@@ -16,11 +16,15 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/movies', movieRoutes);
 app.use('/auth', authRoutes);
-app.use('/watchlist', watchlistRoutes);
+app.use('/watchlist', watchlistRoutes(prisma));
 
-app.listen(port, () => {
-    console.log('server is runninf on port ' + port);
-})
+const start = async () => {
+    await connectDB();
+    app.listen(port, () => {
+        console.log('server is running on port ' + port);
+    });
+};
+start();
 
 process.on('unhandledRejection', async (err) => {
     console.error('Unhandled Rejection:', err);

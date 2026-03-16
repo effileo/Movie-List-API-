@@ -1,10 +1,16 @@
-import {prisma} from "../config/db"
-const addToWatchList= async(req, res) =>{
-    const {movieID, status, rating, notes, userId}= req.body
-// verify movie exist in the movie table
-const movieExist = await prisma.movie.findUnique({
+/**
+ * Watchlist handlers receive the Prisma client from the route (dependency injection)
+ * so the same connected instance is always used.
+ */
+const addToWatchList = (prisma) => async (req, res) => {
+    if (!prisma?.movie) {
+        return res.status(503).json({ error: "Database client not ready" });
+    }
+    const { movieId, status, rating, notes, userId } = req.body;
+    // verify movie exists in the movie table
+    const movieExist = await prisma.movie.findUnique({
     where: {
-        id: movieID,
+        id: movieId,
     }
 }); 
 // if the movie does not exist, return an error response
@@ -14,11 +20,11 @@ if (!movieExist){
     });
 }
 
-const existingInWatchlist = await prisma.watchlistItem.findUnique({
+const existingInWatchlist = await prisma.watchListItem.findUnique({
     where: {
         userId_movieId: {
-            userId: userId,
-            movieId: movieID,
+            userId: Number(userId),
+            movieId,
         }
     }
 });
@@ -28,12 +34,12 @@ if (existingInWatchlist){
         error: "movie already in watchlist."
     })
 };
-const watchlistItem = await prisma.watchlistItem.create({
-    data:{
-        userId,
-        movieId: movieId,
+const watchlistItem = await prisma.watchListItem.create({
+    data: {
+        userId: Number(userId),
+        movieId,
         status: status || "PLANNED",
-        rating,
+        rating: rating != null && rating !== '' ? Math.round(Number(rating)) : undefined,
         notes,
     }
 });
