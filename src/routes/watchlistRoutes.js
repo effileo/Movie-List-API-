@@ -1,6 +1,8 @@
 import express from 'express';
-import { addToWatchList, deleteFromWatchlist, updateWatchlistItem  } from '../controllers/watchlistcontroller.js';
+import { addToWatchList, deleteFromWatchlist, updateWatchlistItem } from '../controllers/watchlistController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import { validateRequest } from '../middleware/validateRequest.js';
+import { addToWatchListSchema } from '../validators/watchlistValidators.js';
 
 /**
  * Prisma is passed from server.js so we use the same connected instance.
@@ -10,7 +12,7 @@ function watchlistRoutes(prisma) {
     const router = express.Router();
     router.use(authMiddleware);
 
-    router.post('/', addToWatchList(prisma));
+    router.post('/', validateRequest(addToWatchListSchema), addToWatchList(prisma));
     router.delete('/:id', deleteFromWatchlist(prisma));
     router.put('/:id', updateWatchlistItem(prisma));
     return router;
