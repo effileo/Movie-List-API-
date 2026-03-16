@@ -30,8 +30,11 @@ if (!user){
     })
 }
 req.user = user;
+next();
 }catch (error){
-
+return res.status(401).json({
+        error: "Not authorized, token failed!"
+    })
 };
 
 };
