@@ -35,15 +35,18 @@ export const apiRoutes = {
     deleteWatchlistComment: (userId, commentId) => api(`/users/${userId}/watchlist/comments/${commentId}`, { method: 'DELETE' }),
     watchlistLikes: (id) => api(`/users/${id}/watchlist/likes`),
     toggleWatchlistLike: (id) => api(`/users/${id}/watchlist/like`, { method: 'POST' }),
+    preview: (id) => api(`/users/${id}/preview`),
   },
   movies: {
     list: (params) => api(`/movies?${new URLSearchParams(params)}`),
     featured: (limit = 6) => api(`/movies/featured?limit=${limit}`),
     popular: (page = 1) => api(`/movies/popular?page=${page}`),
     topRated: (page = 1) => api(`/movies/top-rated?page=${page}`),
+    trending: (window = 'week', page = 1) => api(`/movies/trending?window=${window}&page=${page}`),
     get: (id) => api(`/movies/${id}`),
     search: (q, page = 1) => api(`/movies/search?q=${encodeURIComponent(q)}&page=${page}`),
     tmdb: (id) => api(`/movies/tmdb/${id}`),
+    videos: (id) => api(`/movies/tmdb/${id}/videos`),
     fromTmdb: (tmdbId) => api('/movies/from-tmdb', { method: 'POST', body: JSON.stringify({ tmdbId }) }),
     reviews: (movieId) => api(`/movies/${movieId}/reviews`),
     addReview: (movieId, body) => api(`/movies/${movieId}/reviews`, { method: 'POST', body: JSON.stringify(body) }),
@@ -61,6 +64,9 @@ export const apiRoutes = {
   },
   comments: {
     delete: (id) => api(`/comments/${id}`, { method: 'DELETE' }),
+  },
+  feed: {
+    activity: (limit = 30) => api(`/users/feed/activity?limit=${limit}`),
   },
 };
 

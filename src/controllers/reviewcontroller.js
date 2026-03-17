@@ -14,10 +14,23 @@ export function listReviewsByMovie(prisma) {
             _avg: { rating: true },
             _count: true,
         });
+
+        // Rating distribution: count per rating 1–10
+        const distRaw = await prisma.review.groupBy({
+            by: ['rating'],
+            where: { movieId },
+            _count: true,
+        });
+        const distribution = Array.from({ length: 10 }, (_, i) => {
+            const entry = distRaw.find((d) => d.rating === i + 1);
+            return { rating: i + 1, count: entry?._count ?? 0 };
+        });
+
         res.json({
             status: 'success',
             data: reviews,
             aggregate: { averageRating: agg._avg.rating ?? null, count: agg._count },
+            distribution,
         });
     };
 }

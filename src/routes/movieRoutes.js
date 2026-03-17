@@ -1,5 +1,5 @@
 import express from 'express';
-import { fetchMovieById, searchMovies, fetchPopularMovies, fetchTopRatedMovies } from '../services/tmdb.js';
+import { fetchMovieById, searchMovies, fetchPopularMovies, fetchTopRatedMovies, fetchTrendingMovies, fetchMovieVideos } from '../services/tmdb.js';
 import { findOrCreateFromTmdb, listMovies, listFeatured } from '../controllers/moviecontroller.js';
 import { listReviewsByMovie, createOrUpdateReview } from '../controllers/reviewcontroller.js';
 import { listCommentsByMovie, createComment } from '../controllers/commentcontroller.js';
@@ -42,6 +42,17 @@ function movieRoutes(prisma) {
         }
     });
 
+    /** GET /movies/trending?window=week&page=1 – TMDB trending movies. */
+    router.get('/trending', async (req, res) => {
+        try {
+            const window = req.query.window || 'week';
+            const data = await fetchTrendingMovies(window, req.query.page);
+            res.json(data);
+        } catch (err) {
+            res.status(502).json({ error: err.message || 'Failed to fetch trending movies' });
+        }
+    });
+
     /** GET /movies/search?q=...&page=1 – search movies on TMDB (no DB). */
     router.get('/search', async (req, res) => {
         const q = req.query.q?.trim();
@@ -64,6 +75,16 @@ function movieRoutes(prisma) {
         } catch (err) {
             const status = err.message.startsWith('TMDB API error 404') ? 404 : 502;
             res.status(status).json({ error: err.message });
+        }
+    });
+
+    /** GET /movies/tmdb/:id/videos – fetch movie videos from TMDB. */
+    router.get('/tmdb/:id/videos', async (req, res) => {
+        try {
+            const data = await fetchMovieVideos(req.params.id);
+            res.json(data);
+        } catch (err) {
+            res.status(502).json({ error: err.message || 'Failed to fetch videos' });
         }
     });
 

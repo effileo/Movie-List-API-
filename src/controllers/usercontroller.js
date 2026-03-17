@@ -86,3 +86,48 @@ export function getPublicWatchlist(prisma) {
         res.json({ status: 'success', data: items });
     };
 }
+
+/**
+ * GET /users/:id/preview – Lightweight user preview for hover popovers.
+ * Returns top 3 highest-rated movies and total movies watched.
+ */
+export function getUserPreview(prisma) {
+    return async (req, res) => {
+        const id = parseInt(req.params.id, 10);
+        if (Number.isNaN(id)) {
+            return res.status(400).json({ error: 'Invalid user id' });
+        }
+        const user = await prisma.user.findUnique({
+            where: { id },
+            select: { id: true, name: true, avatarUrl: true, bio: true },
+        });
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        // Top 3 highest-rated movies by this user
+        const topReviews = await prisma.review.findMany({
+            where: { userId: id },
+            orderBy: { rating: 'desc' },
+            take: 3,
+            include: {
+                movie: { select: { id: true, title: true, posterPath: true, tmdbId: true } },
+            },
+        });
+
+        // Total movies watched (COMPLETED status)
+        const totalWatched = await prisma.watchListItem.count({
+            where: { userId: id, status: 'COMPLETED' },
+        });
+
+        res.json({
+            status: 'success',
+            data: {
+                ...user,
+                topMovies: topReviews.map((r) => ({
+                    movie: r.movie,
+                    rating: r.rating,
+                })),
+                totalWatched,
+            },
+        });
+    };
+}

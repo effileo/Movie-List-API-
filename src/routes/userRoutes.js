@@ -1,5 +1,6 @@
 import express from 'express';
-import { getPublicProfile, getPublicWatchlist, getWatchlistFeed } from '../controllers/usercontroller.js';
+import { getPublicProfile, getPublicWatchlist, getWatchlistFeed, getUserPreview } from '../controllers/usercontroller.js';
+import { getActivityFeed } from '../controllers/feedcontroller.js';
 import {
     listWatchlistComments,
     createWatchlistComment,
@@ -13,6 +14,9 @@ import { watchlistCommentSchema } from '../validators/watchlistValidators.js';
 function userRoutes(prisma) {
     const router = express.Router();
 
+    /** Global activity feed (must be before /:id) */
+    router.get('/feed/activity', getActivityFeed(prisma));
+
     /** Feed of public watchlists (must be before /:id) */
     router.get('/feed/watchlists', getWatchlistFeed(prisma));
 
@@ -22,6 +26,9 @@ function userRoutes(prisma) {
     router.delete('/:id/watchlist/comments/:commentId', authMiddleware, deleteWatchlistComment(prisma));
     router.get('/:id/watchlist/likes', getWatchlistLikes(prisma));
     router.post('/:id/watchlist/like', authMiddleware, toggleWatchlistLike(prisma));
+
+    /** User preview for hover popovers */
+    router.get('/:id/preview', getUserPreview(prisma));
 
     router.get('/:id/watchlist', getPublicWatchlist(prisma));
     router.get('/:id', getPublicProfile(prisma));

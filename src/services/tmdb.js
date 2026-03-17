@@ -53,6 +53,24 @@ export async function fetchTopRatedMovies(page = 1) {
 }
 
 /**
+ * Fetch trending movies from TMDB (default window: week).
+ * Returns TMDB response: { page, results: [...], total_pages, total_results }.
+ */
+export async function fetchTrendingMovies(window = 'week', page = 1) {
+    const key = process.env.TMDB_API_KEY;
+    if (!key) throw new Error('TMDB_API_KEY is not set in .env');
+    const p = Math.max(1, parseInt(page, 10) || 1);
+    const validWindow = ['day', 'week'].includes(window) ? window : 'week';
+    const url = `${TMDB_BASE}/trending/movie/${validWindow}?api_key=${key}&page=${p}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`TMDB API error ${res.status}: ${text}`);
+    }
+    return res.json();
+}
+
+/**
  * Search movies on TMDB by query string.
  * Returns TMDB response: { page, results: [...], total_pages, total_results }.
  */
@@ -93,4 +111,20 @@ export function mapTmdbMovieToDb(tmdbMovie, createdByUserId) {
         backdropPath: tmdbMovie.backdrop_path ?? null,
         createdBy: createdByUserId,
     };
+}
+
+/**
+ * Fetch videos for a specific movie from TMDB.
+ * Returns { id, results: [ { key, name, site, type, official } ] }
+ */
+export async function fetchMovieVideos(tmdbId) {
+    const key = process.env.TMDB_API_KEY;
+    if (!key) throw new Error('TMDB_API_KEY is not set in .env');
+    const url = `${TMDB_BASE}/movie/${tmdbId}/videos?api_key=${key}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`TMDB API error ${res.status}: ${text}`);
+    }
+    return res.json();
 }
