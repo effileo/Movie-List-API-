@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, useNavigate, Navigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuth } from './context/AuthContext.jsx';
+import MarketingPage from './pages/MarketingPage.jsx';
 import Landing from './pages/Landing.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
@@ -29,7 +31,7 @@ function Nav() {
   return (
     <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-cinematic-bg/60 backdrop-blur-xl border-b border-cinematic-border/50 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-3 group">
+        <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-3 group">
           <div className="p-2 rounded-xl bg-gradient-to-tr from-cinematic-accent to-purple-600 shadow-[0_0_20px_rgba(59,130,246,0.3)] group-hover:scale-105 transition-transform duration-300">
             <FilmIcon className="text-white w-5 h-5" />
           </div>
@@ -55,7 +57,6 @@ function Nav() {
             </>
           ) : (
             <>
-              <Link to="/discover" className="text-cinematic-muted hover:text-white transition-colors">Discover</Link>
               <Link to="/login" className="text-cinematic-muted hover:text-white transition-colors">Log in</Link>
               <Link to="/register" className="px-5 py-2.5 rounded-full bg-cinematic-accent text-white hover:bg-blue-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all hover:scale-105">
                 Register
@@ -68,13 +69,41 @@ function Nav() {
   );
 }
 
+// Create a client for React Query
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false, // Don't refetch recommendations just by switching tabs
+      staleTime: 5 * 60 * 1000, // Keep data fresh for 5 minutes
+    },
+  },
+});
+
+// Navigation Route Guard component
+function AuthGuard({ children, requireAuth = true, redirect = "/" }) {
+  const { user, loading } = useAuth();
+  
+  if (loading) return null; // Wait to render until auth settles
+
+  if (requireAuth && !user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!requireAuth && user) {
+     return <Navigate to={redirect} replace />;
+  }
+
+  return children;
+}
+
 // Wrapping layout that provides the cinematic background
 export default function App() {
   const [activeBackdrop, setActiveBackdrop] = useState(null);
 
   return (
-    <BrowserRouter>
-      {/* Expose background setter via context if needed, or window for deep components */}
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        {/* Expose background setter via context if needed, or window for deep components */}
       <div 
         className="relative min-h-screen w-full bg-cinematic-bg text-cinematic-text overflow-hidden selection:bg-cinematic-accent selection:text-white"
         // We attach setActiveBackdrop to window so deeply nested components (like Landing) can trigger backdrops easily without heavy prop drilling.
@@ -108,23 +137,39 @@ export default function App() {
         <div className="relative z-10 flex flex-col min-h-screen">
           <Nav />
           <main className="flex-1 w-full pt-20">
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/search" element={<Search />} />
-              <Route path="/watchlist" element={<Watchlist />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/discover" element={<DiscoverWatchlists />} />
-              <Route path="/users/:id" element={<Profile />} />
-              <Route path="/users/:id/watchlist" element={<PublicWatchlist />} />
-              <Route path="/movies/list/:listType" element={<MovieListPage />} />
-              <Route path="/movies/:id" element={<MovieDetail />} />
-              <Route path="/movie/tmdb/:tmdbId" element={<TmdbMovie />} />
-            </Routes>
+            {/* AnimatePresence for the Zoom-through transition out of the marketing page */}
+            <AnimatePresence mode="wait">
+              <Routes>
+                {/* 
+                  Conditional Root: 
+                  If user exists, hitting '/' redirects to '/dashboard'. 
+                  If no user, hitting '/' shows the immersive Marketing Page. 
+                */}
+                <Route path="/" element={<AuthGuard requireAuth={false} redirect="/dashboard"><MarketingPage /></AuthGuard>} />
+                
+                {/* Protected Dashboard */}
+                <Route path="/dashboard" element={<AuthGuard requireAuth={true}><Landing /></AuthGuard>} />
+                
+                {/* Auth */}
+                <Route path="/login" element={<AuthGuard requireAuth={false} redirect="/dashboard"><Login /></AuthGuard>} />
+                <Route path="/register" element={<AuthGuard requireAuth={false} redirect="/dashboard"><Register /></AuthGuard>} />
+                
+                {/* Standard Routes */}
+                <Route path="/search" element={<Search />} />
+                <Route path="/watchlist" element={<AuthGuard requireAuth={true}><Watchlist /></AuthGuard>} />
+                <Route path="/profile" element={<AuthGuard requireAuth={true}><Profile /></AuthGuard>} />
+                <Route path="/discover" element={<AuthGuard requireAuth={true}><DiscoverWatchlists /></AuthGuard>} />
+                <Route path="/users/:id" element={<Profile />} />
+                <Route path="/users/:id/watchlist" element={<PublicWatchlist />} />
+                <Route path="/movies/list/:listType" element={<MovieListPage />} />
+                <Route path="/movies/:id" element={<MovieDetail />} />
+                <Route path="/movie/tmdb/:tmdbId" element={<TmdbMovie />} />
+              </Routes>
+            </AnimatePresence>
           </main>
         </div>
       </div>
-    </BrowserRouter>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }

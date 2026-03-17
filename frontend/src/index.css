@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* Tailwind CSS v4 custom theme configuration */
 @theme {
   --color-cinematic-bg: #050510;
   --color-cinematic-surface: rgba(255, 255, 255, 0.03);

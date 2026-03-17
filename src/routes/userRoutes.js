@@ -7,6 +7,7 @@ import {
     deleteWatchlistComment,
 } from '../controllers/watchlistCommentController.js';
 import { getWatchlistLikes, toggleWatchlistLike } from '../controllers/watchlistLikeController.js';
+import { getRecommendations, getSurpriseMe } from '../controllers/recommendationController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 import { validateRequest } from '../middleware/validateRequest.js';
 import { watchlistCommentSchema } from '../validators/watchlistValidators.js';
@@ -26,6 +27,10 @@ function userRoutes(prisma) {
     router.delete('/:id/watchlist/comments/:commentId', authMiddleware, deleteWatchlistComment(prisma));
     router.get('/:id/watchlist/likes', getWatchlistLikes(prisma));
     router.post('/:id/watchlist/like', authMiddleware, toggleWatchlistLike(prisma));
+
+    // Personalized Recommendations ('For You')
+    router.get('/me/recommendations', authMiddleware, getRecommendations(prisma));
+    router.get('/me/recommendations/surprise', authMiddleware, getSurpriseMe(prisma));
 
     /** User preview for hover popovers */
     router.get('/:id/preview', getUserPreview(prisma));

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import HeroSection from '../components/HeroSection';
 import MovieRow from '../components/MovieRow';
 import ActivityFeed from '../components/ActivityFeed';
+import ForYouSection from '../components/ForYouSection';
 
 export default function Landing() {
   // Grab the window-attached active backdrop setter established in App.jsx wrapper
@@ -46,8 +47,12 @@ export default function Landing() {
           <MovieRow endpoint="/api/movies/popular" onHoverBackdrop={setAppBackdrop} />
         </section>
 
+        <section className="px-6 md:px-16 mt-8">
+          <ForYouSection />
+        </section>
+
         {/* Social Pulse Activity Feed */}
-        <section className="px-6 md:px-16">
+        <section className="px-6 md:px-16 mt-8">
           <div className="hidden md:block h-[1px] w-full mb-10 bg-gradient-to-r from-transparent via-slate-700/50 to-transparent"></div>
           <ActivityFeed />
         </section>
