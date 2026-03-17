@@ -19,6 +19,40 @@ export async function fetchMovieById(tmdbId) {
 }
 
 /**
+ * Fetch popular (most viewed) movies from TMDB.
+ * Returns TMDB response: { page, results: [...], total_pages, total_results }.
+ */
+export async function fetchPopularMovies(page = 1) {
+    const key = process.env.TMDB_API_KEY;
+    if (!key) throw new Error('TMDB_API_KEY is not set in .env');
+    const p = Math.max(1, parseInt(page, 10) || 1);
+    const url = `${TMDB_BASE}/movie/popular?api_key=${key}&page=${p}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`TMDB API error ${res.status}: ${text}`);
+    }
+    return res.json();
+}
+
+/**
+ * Fetch top rated movies from TMDB.
+ * Returns TMDB response: { page, results: [...], total_pages, total_results }.
+ */
+export async function fetchTopRatedMovies(page = 1) {
+    const key = process.env.TMDB_API_KEY;
+    if (!key) throw new Error('TMDB_API_KEY is not set in .env');
+    const p = Math.max(1, parseInt(page, 10) || 1);
+    const url = `${TMDB_BASE}/movie/top_rated?api_key=${key}&page=${p}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`TMDB API error ${res.status}: ${text}`);
+    }
+    return res.json();
+}
+
+/**
  * Search movies on TMDB by query string.
  * Returns TMDB response: { page, results: [...], total_pages, total_results }.
  */

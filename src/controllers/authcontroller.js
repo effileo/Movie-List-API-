@@ -92,10 +92,42 @@ const getMe = async (req, res) => {
             id: user.id,
             name: user.name,
             email: user.email,
+            bio: user.bio ?? null,
+            avatarUrl: user.avatarUrl ?? null,
+            watchlistPublic: user.watchlistPublic ?? true,
             createdAt: user.createdAt,
             updatedAt: user.updatedAt,
         },
     });
 };
 
-export { register, login, logout, getMe };
+/** PATCH /auth/me – update profile (name, bio, avatarUrl, watchlistPublic). Requires auth. */
+const updateProfile = async (req, res) => {
+    const userId = req.user?.id;
+    if (!userId) return res.status(401).json({ error: "Not authorized" });
+    const { name, bio, avatarUrl, watchlistPublic } = req.body;
+    const user = await prisma.user.update({
+        where: { id: userId },
+        data: {
+            ...(name != null && { name }),
+            ...(bio !== undefined && { bio: bio || null }),
+            ...(avatarUrl !== undefined && { avatarUrl: avatarUrl || null }),
+            ...(watchlistPublic !== undefined && { watchlistPublic }),
+        },
+    });
+    res.status(200).json({
+        status: "success",
+        data: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            bio: user.bio ?? null,
+            avatarUrl: user.avatarUrl ?? null,
+            watchlistPublic: user.watchlistPublic ?? true,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+        },
+    });
+};
+
+export { register, login, logout, getMe, updateProfile };

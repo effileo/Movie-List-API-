@@ -62,4 +62,51 @@ const findOrCreateFromTmdb = (prisma) => async (req, res) => {
     }
 };
 
-export { findOrCreateFromTmdb, listMovies };
+/**
+ * GET /movies/featured – movies that have at least one review, with poster and one featured review.
+ * For landing page recommendations.
+ */
+const listFeatured = (prisma) => async (req, res) => {
+    const limit = Math.min(12, Math.max(1, parseInt(req.query.limit, 10) || 6));
+    const moviesWithReviews = await prisma.movie.findMany({
+        where: { reviews: { some: {} } },
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+            reviews: {
+                take: 1,
+                orderBy: { createdAt: 'desc' },
+                include: { user: { select: { id: true, name: true } } },
+            },
+        },
+    });
+    const movieIds = moviesWithReviews.map((m) => m.id);
+    const aggregates = await prisma.review.groupBy({
+        by: ['movieId'],
+        _avg: { rating: true },
+        _count: true,
+        where: { movieId: { in: movieIds } },
+    });
+    const aggMap = Object.fromEntries(
+        aggregates.map((a) => [a.movieId, { averageRating: a._avg.rating, count: a._count }])
+    );
+    const data = moviesWithReviews.map((m) => {
+        const [featuredReview] = m.reviews || [];
+        const { reviews, ...movie } = m;
+        return {
+            movie,
+            featuredReview: featuredReview
+                ? {
+                    id: featuredReview.id,
+                    rating: featuredReview.rating,
+                    text: featuredReview.text,
+                    user: featuredReview.user,
+                }
+                : null,
+            aggregate: aggMap[m.id] ?? null,
+        };
+    });
+    res.json({ status: 'success', data });
+};
+
+export { findOrCreateFromTmdb, listMovies, listFeatured };

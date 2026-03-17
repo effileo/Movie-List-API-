@@ -13,15 +13,20 @@ datasource db {
 }
 
 model user{
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             Int      @id @default(autoincrement())
+  name           String
+  email          String   @unique
+  password       String
+  bio            String?
+  avatarUrl      String?
+  watchlistPublic Boolean @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
   //relations
   watchListItems watchListItem[]
-  movies movie[]
+  movies         movie[]
+  reviews        review[]
+  comments       comment[]
 }
 model movie{
   id          String   @id @default(uuid())
@@ -38,6 +43,8 @@ model movie{
   //relations
   creator user @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   watchListItems watchListItem[]
+  reviews        review[]
+  comments       comment[]
 }
 model watchListItem{
   id String @id @default(uuid())
@@ -60,4 +67,26 @@ enum WatchListStatus{
   WATCHING
   COMPLETED
   DROPPED
+}
+
+model review{
+  id        String   @id @default(uuid())
+  userId    Int
+  movieId   String
+  rating    Int
+  text      String?
+  createdAt DateTime @default(now())
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie     movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  @@unique([userId, movieId])
+}
+
+model comment{
+  id        String   @id @default(uuid())
+  userId    Int
+  movieId   String
+  text      String
+  createdAt DateTime @default(now())
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie     movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
 }

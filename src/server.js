@@ -10,6 +10,9 @@ import { validateEnv } from './config/env.js';
 import authRoutes from './routes/authRoutes.js';
 import prisma from './config/db.js';
 import watchlistRoutes from './routes/watchlistRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import reviewRoutes from './routes/reviewRoutes.js';
+import commentRoutes from './routes/commentRoutes.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
 
 config();
@@ -32,6 +35,9 @@ app.use('/auth', rateLimit({
 
 app.use('/movies', movieRoutes(prisma));
 app.use('/watchlist', watchlistRoutes(prisma));
+app.use('/users', userRoutes(prisma));
+app.use('/reviews', reviewRoutes(prisma));
+app.use('/comments', commentRoutes(prisma));
 
 app.get('/health', async (req, res) => {
     try {
