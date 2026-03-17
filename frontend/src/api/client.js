@@ -65,3 +65,17 @@ export const apiRoutes = {
 };
 
 export const TMDB_IMG = 'https://image.tmdb.org/t/p/w500';
+
+/** Data URI for a dark "No Poster" placeholder (works offline, no external request). */
+export const POSTER_PLACEHOLDER =
+  'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="500" height="750" viewBox="0 0 500 750"><rect fill="%231e2a4a" width="500" height="750"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2392beff" font-family="sans-serif" font-size="24">No Poster</text></svg>');
+
+/** Build TMDB poster URL from path (handles null, relative path with/without leading slash). */
+export function posterUrl(posterPath) {
+  if (posterPath == null || typeof posterPath !== 'string') return null;
+  const path = String(posterPath).trim();
+  if (!path || path === 'undefined' || path === 'null' || path.length < 5) return null;
+  if (path.startsWith('http')) return path;
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+  return `${TMDB_IMG}${normalized}`;
+}

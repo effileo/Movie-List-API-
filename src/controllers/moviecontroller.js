@@ -90,7 +90,7 @@ const listFeatured = (prisma) => async (req, res) => {
     const aggMap = Object.fromEntries(
         aggregates.map((a) => [a.movieId, { averageRating: a._avg.rating, count: a._count }])
     );
-    const data = moviesWithReviews.map((m) => {
+    let data = moviesWithReviews.map((m) => {
         const [featuredReview] = m.reviews || [];
         const { reviews, ...movie } = m;
         return {
@@ -106,6 +106,42 @@ const listFeatured = (prisma) => async (req, res) => {
             aggregate: aggMap[m.id] ?? null,
         };
     });
+
+    // Enrich movies missing posterPath by fetching from TMDB (e.g. older DB rows)
+    const toEnrich = data.filter((d) => !d.movie.posterPath && d.movie.tmdbId);
+    if (toEnrich.length > 0) {
+        const enrichedList = await Promise.all(
+            toEnrich.map(async (item) => {
+                try {
+                    const tmdbMovie = await fetchMovieById(item.movie.tmdbId);
+                    const posterPath = tmdbMovie.poster_path ?? null;
+                    const backdropPath = tmdbMovie.backdrop_path ?? null;
+                    if (posterPath || backdropPath) {
+                        await prisma.movie.update({
+                            where: { id: item.movie.id },
+                            data: {
+                                ...(posterPath && { posterPath }),
+                                ...(backdropPath && { backdropPath }),
+                            },
+                        });
+                    }
+                    return {
+                        ...item,
+                        movie: {
+                            ...item.movie,
+                            posterPath: posterPath ?? item.movie.posterPath,
+                            backdropPath: backdropPath ?? item.movie.backdropPath,
+                        },
+                    };
+                } catch {
+                    return item;
+                }
+            })
+        );
+        const enrichedById = Object.fromEntries(enrichedList.map((e) => [e.movie.id, e]));
+        data = data.map((d) => enrichedById[d.movie.id] ?? d);
+    }
+
     res.json({ status: 'success', data });
 };
 

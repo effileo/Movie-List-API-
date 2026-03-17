@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { apiRoutes, TMDB_IMG } from '../api/client.js';
+import { apiRoutes, TMDB_IMG, posterUrl, POSTER_PLACEHOLDER } from '../api/client.js';
 import './Landing.css';
 
 export default function Landing() {
@@ -140,13 +140,19 @@ export default function Landing() {
           ) : (
             <div className="recommendations-grid">
               {featured.map(({ movie, featuredReview, aggregate }) => {
-                const posterUrl = movie.posterPath
-                  ? `${TMDB_IMG}${movie.posterPath}`
-                  : 'https://via.placeholder.com/500x750?text=No+Poster';
+                const posterSrc = posterUrl(movie.posterPath) || POSTER_PLACEHOLDER;
                 return (
                   <Link to={`/movies/${movie.id}`} key={movie.id} className="recommendation-card">
                     <div className="recommendation-poster-wrap">
-                      <img src={posterUrl} alt={movie.title} loading="lazy" />
+                      <img
+                        src={posterSrc}
+                        alt={movie.title}
+                        loading="lazy"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = POSTER_PLACEHOLDER;
+                        }}
+                      />
                       {aggregate?.averageRating != null && (
                         <span className="recommendation-rating-badge">
                           ★ {Number(aggregate.averageRating).toFixed(1)}

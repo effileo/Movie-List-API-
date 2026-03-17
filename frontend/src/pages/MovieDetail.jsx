@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { apiRoutes, TMDB_IMG } from '../api/client.js';
+import { apiRoutes, TMDB_IMG, posterUrl, POSTER_PLACEHOLDER } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import './Movies.css';
 
@@ -109,13 +109,13 @@ export default function MovieDetail() {
   if (loading) return <div className="page-center">Loading…</div>;
   if (error && !movie) return <div className="page-center"><p className="movies-message">{error}</p><Link to="/">Home</Link></div>;
 
-  const posterUrl = movie.posterPath ? `${TMDB_IMG}${movie.posterPath}` : 'https://via.placeholder.com/500x750?text=No+Poster';
+  const posterSrc = posterUrl(movie.posterPath) || POSTER_PLACEHOLDER;
   const myReview = reviews.find((r) => r.user?.id === user?.id);
 
   return (
     <div className="movie-detail">
       <div className="movie-detail-main">
-        <img src={posterUrl} alt="" className="movie-detail-poster" />
+        <img src={posterSrc} alt="" className="movie-detail-poster" onError={(e) => { e.target.onerror = null; e.target.src = POSTER_PLACEHOLDER; }} />
         <div className="movie-detail-info">
           <h1>{movie.title}</h1>
           <p className="movie-year">{movie.year}</p>

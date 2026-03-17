@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { apiRoutes, TMDB_IMG } from '../api/client.js';
+import { apiRoutes, TMDB_IMG, posterUrl, POSTER_PLACEHOLDER } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import './Movies.css';
 
@@ -172,9 +172,10 @@ export default function PublicWatchlist() {
             <div key={item.id} className="movie-card">
               <Link to={`/movies/${item.movie.id}`}>
                 <img
-                  src={item.movie.posterPath ? `${TMDB_IMG}${item.movie.posterPath}` : 'https://via.placeholder.com/500x750?text=No+Poster'}
+                  src={posterUrl(item.movie.posterPath) || POSTER_PLACEHOLDER}
                   alt=""
                   className="movie-poster"
+                  onError={(e) => { e.target.onerror = null; e.target.src = POSTER_PLACEHOLDER; }}
                 />
               </Link>
               <div className="movie-info">

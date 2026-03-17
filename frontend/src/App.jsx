@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext.jsx';
 import Landing from './pages/Landing.jsx';
 import Login from './pages/Login.jsx';
@@ -15,6 +15,13 @@ import './App.css';
 
 function Nav() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    await logout();
+    navigate('/', { replace: true });
+  }
+
   return (
     <nav className="nav">
       <Link to="/" className="nav-brand">Movie Watchlist</Link>
@@ -26,7 +33,7 @@ function Nav() {
             <Link to="/discover">Discover</Link>
             <Link to="/profile">Profile</Link>
             <span className="nav-user">{user.name}</span>
-            <button type="button" className="nav-btn" onClick={logout}>Log out</button>
+            <button type="button" className="nav-btn" onClick={handleLogout}>Log out</button>
           </>
         ) : (
           <>
