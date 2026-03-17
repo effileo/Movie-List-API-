@@ -30,12 +30,15 @@ export default function Landing() {
     return <div className="page-center">Loading…</div>;
   }
 
-  function MovieRow({ title, subtitle, movies, loading: rowLoading, emptyMsg }) {
+  function MovieRow({ title, subtitle, movies, loading: rowLoading, emptyMsg, viewAllLink }) {
     if (rowLoading) {
       return (
         <section className="landing-row">
           <div className="landing-row-header">
-            <h2>{title}</h2>
+            <div className="landing-row-title-wrap">
+              <h2>{title}</h2>
+              {viewAllLink && <Link to={viewAllLink} className="landing-view-all">View all</Link>}
+            </div>
             {subtitle && <p className="landing-row-subtitle">{subtitle}</p>}
           </div>
           <div className="landing-row-loading">{emptyMsg || 'Loading…'}</div>
@@ -46,10 +49,13 @@ export default function Landing() {
     return (
       <section className="landing-row">
         <div className="landing-row-header">
-          <h2>{title}</h2>
+          <div className="landing-row-title-wrap">
+            <h2>{title}</h2>
+            {viewAllLink && <Link to={viewAllLink} className="landing-view-all">View all</Link>}
+          </div>
           {subtitle && <p className="landing-row-subtitle">{subtitle}</p>}
         </div>
-        <div className="landing-movie-scroll">
+        <div className="landing-movie-list">
           {movies.map((m) => {
             const posterUrl = m.poster_path
               ? `${TMDB_IMG}${m.poster_path}`
@@ -107,6 +113,7 @@ export default function Landing() {
         movies={popular}
         loading={loadingPopular}
         emptyMsg="Could not load popular movies."
+        viewAllLink="/movies/list/popular"
       />
       <MovieRow
         title="Top rated"
@@ -114,12 +121,16 @@ export default function Landing() {
         movies={topRated}
         loading={loadingTopRated}
         emptyMsg="Could not load top rated movies."
+        viewAllLink="/movies/list/top-rated"
       />
 
       {(loadingFeatured || featured.length > 0) && (
         <section className="landing-row landing-reviews">
           <div className="landing-row-header">
-            <h2>Community reviews</h2>
+            <div className="landing-row-title-wrap">
+              <h2>Community reviews</h2>
+              <Link to="/search" className="landing-view-all">View all</Link>
+            </div>
             <p className="landing-row-subtitle">What others are saying</p>
           </div>
           {loadingFeatured ? (

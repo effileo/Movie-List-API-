@@ -57,6 +57,9 @@
 }
 
 .movie-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
   border-radius: 14px;
   overflow: hidden;
@@ -100,7 +103,41 @@
 .movie-year {
   color: #9ca8c9;
   font-size: 0.85rem;
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.25rem;
+}
+
+.movie-rating {
+  font-size: 0.85rem;
+  color: #ffd54f;
+  font-weight: 600;
+}
+
+.movies-page-header {
+  margin-bottom: 1.5rem;
+}
+
+.movies-page-header h1 {
+  margin: 0 0 0.25rem;
+}
+
+.movies-page-subtitle {
+  color: #9ca8c9;
+  font-size: 0.95rem;
+  margin: 0 0 0.75rem;
+}
+
+.movies-load-more {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.btn-sm {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+.movie-grid-full {
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
 }
 
 .movie-status {

@@ -7,6 +7,7 @@ import Search from './pages/Search.jsx';
 import Watchlist from './pages/Watchlist.jsx';
 import MovieDetail from './pages/MovieDetail.jsx';
 import TmdbMovie from './pages/TmdbMovie.jsx';
+import MovieListPage from './pages/MovieListPage.jsx';
 import Profile from './pages/Profile.jsx';
 import PublicWatchlist from './pages/PublicWatchlist.jsx';
 import './App.css';
@@ -51,6 +52,7 @@ export default function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/users/:id" element={<Profile />} />
             <Route path="/users/:id/watchlist" element={<PublicWatchlist />} />
+            <Route path="/movies/list/:listType" element={<MovieListPage />} />
             <Route path="/movies/:id" element={<MovieDetail />} />
             <Route path="/movie/tmdb/:tmdbId" element={<TmdbMovie />} />
           </Routes>

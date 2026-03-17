@@ -95,11 +95,33 @@
   margin-bottom: 1.25rem;
 }
 
-.landing-row-header h2 {
-  margin: 0 0 0.25rem;
+.landing-row-title-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.25rem;
+}
+
+.landing-row-title-wrap h2 {
+  margin: 0;
   font-size: 1.75rem;
   font-weight: 700;
   letter-spacing: -0.02em;
+}
+
+.landing-view-all {
+  font-size: 0.95rem;
+  color: #92beff;
+  text-decoration: none;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.landing-view-all:hover {
+  text-decoration: underline;
+  color: #b0ceff;
 }
 
 .landing-row-subtitle {
@@ -114,33 +136,32 @@
   text-align: center;
 }
 
-/* Horizontal scroll of movie cards */
-.landing-movie-scroll {
-  display: flex;
-  gap: 1.25rem;
-  overflow-x: auto;
-  padding-bottom: 0.75rem;
-  scroll-snap-type: x proximity;
+/* Vertical scrollable list of movie cards */
+.landing-movie-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+  max-height: 420px;
+  overflow-y: auto;
+  padding: 0.25rem 0.25rem 0.75rem 0;
   -webkit-overflow-scrolling: touch;
 }
 
-.landing-movie-scroll::-webkit-scrollbar {
-  height: 8px;
+.landing-movie-list::-webkit-scrollbar {
+  width: 8px;
 }
 
-.landing-movie-scroll::-webkit-scrollbar-track {
+.landing-movie-list::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.06);
   border-radius: 4px;
 }
 
-.landing-movie-scroll::-webkit-scrollbar-thumb {
+.landing-movie-list::-webkit-scrollbar-thumb {
   background: rgba(146, 190, 255, 0.35);
   border-radius: 4px;
 }
 
 .landing-movie-card {
-  flex: 0 0 160px;
-  scroll-snap-align: start;
   text-decoration: none;
   color: inherit;
   border-radius: 14px;
@@ -203,14 +224,32 @@
 }
 
 /* Community reviews section */
-.landing-reviews .landing-row-header h2 {
-  margin-bottom: 0.25rem;
+.landing-reviews .landing-row-title-wrap h2 {
+  margin: 0;
 }
 
 .landing-reviews .recommendations-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1.5rem;
+  max-height: 480px;
+  overflow-y: auto;
+  padding: 0.25rem 0.25rem 0.75rem 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.landing-reviews .recommendations-grid::-webkit-scrollbar {
+  width: 8px;
+}
+
+.landing-reviews .recommendations-grid::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+}
+
+.landing-reviews .recommendations-grid::-webkit-scrollbar-thumb {
+  background: rgba(146, 190, 255, 0.35);
+  border-radius: 4px;
 }
 
 .recommendation-card {
@@ -364,8 +403,9 @@
     padding: 3rem 1rem 3.5rem;
   }
 
-  .landing-movie-card {
-    flex: 0 0 130px;
+  .landing-movie-list {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    max-height: 360px;
   }
 
   .landing-movie-info h3 {
