@@ -28,7 +28,13 @@ export const apiRoutes = {
   },
   users: {
     get: (id) => api(`/users/${id}`),
+    watchlistFeed: (limit = 20) => api(`/users/feed/watchlists?limit=${limit}`),
     watchlist: (id) => api(`/users/${id}/watchlist`),
+    watchlistComments: (id) => api(`/users/${id}/watchlist/comments`),
+    addWatchlistComment: (id, body) => api(`/users/${id}/watchlist/comments`, { method: 'POST', body: JSON.stringify(body) }),
+    deleteWatchlistComment: (userId, commentId) => api(`/users/${userId}/watchlist/comments/${commentId}`, { method: 'DELETE' }),
+    watchlistLikes: (id) => api(`/users/${id}/watchlist/likes`),
+    toggleWatchlistLike: (id) => api(`/users/${id}/watchlist/like`, { method: 'POST' }),
   },
   movies: {
     list: (params) => api(`/movies?${new URLSearchParams(params)}`),

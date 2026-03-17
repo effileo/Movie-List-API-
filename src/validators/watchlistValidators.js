@@ -1,19 +1,16 @@
 import { z } from 'zod';
 
-const addToWatchListSchema = z
-    .object({
-        movieId: z.string().uuid().optional(),
-        tmdbId: z.coerce.number().int().positive().optional(),
-        status: z
-            .enum(['PLANNED', 'WATCHING', 'COMPLETED', 'DROPPED'], {
-                error: () => ({ message: 'status must be one of PLANNED, WATCHING, COMPLETED, DROPPED' }),
-            })
-            .optional(),
-        rating: z.coerce.number().int().min(0).max(10).optional(),
-        notes: z.string().optional(),
-    })
-    .refine((data) => data.movieId != null || data.tmdbId != null, {
-        message: 'Provide either movieId (our DB uuid) or tmdbId (TMDB numeric id)',
-    });
+/** Add to watchlist: tmdbId (or movieId) and optional status. */
+export const addToWatchListSchema = z.object({
+    movieId: z.string().uuid().optional(),
+    tmdbId: z.union([z.number(), z.string().transform(Number)]).optional(),
+    status: z.enum(['PLANNED', 'WATCHING', 'COMPLETED', 'DROPPED']).optional().default('PLANNED'),
+    rating: z.number().min(1).max(10).optional(),
+    notes: z.string().max(2000).optional(),
+}).refine((data) => data.movieId != null || data.tmdbId != null, {
+    message: 'Either movieId or tmdbId is required',
+});
 
-export { addToWatchListSchema };
+export const watchlistCommentSchema = z.object({
+    text: z.string().min(1, 'Comment text required').max(2000),
+});

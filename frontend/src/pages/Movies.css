@@ -189,6 +189,12 @@
   border: 1px solid rgba(255, 255, 255, 0.14);
 }
 
+.btn-ghost {
+  background: transparent;
+  color: #a7cbff;
+  border: 1px solid rgba(146, 190, 255, 0.5);
+}
+
 .btn-danger {
   background: linear-gradient(135deg, #e45353, #ff7a7a);
   color: #fff;
@@ -375,6 +381,97 @@
 
 .muted {
   color: #9ca8c9;
+}
+
+/* Watchlist engagement (likes + comments) */
+.watchlist-engagement {
+  margin-bottom: 2rem;
+  padding: 1.25rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.watchlist-likes {
+  margin-bottom: 1.25rem;
+}
+
+.watchlist-like-count {
+  font-size: 1rem;
+  color: #b9c5e8;
+}
+
+.watchlist-like-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #e8eef8;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.watchlist-like-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.watchlist-like-btn.liked {
+  color: #ff6b9d;
+  border-color: rgba(255, 107, 157, 0.4);
+}
+
+.watchlist-like-btn:disabled {
+  opacity: 0.8;
+  cursor: default;
+}
+
+.watchlist-comments-section h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.2rem;
+}
+
+.watchlist-comment-form {
+  margin-bottom: 1rem;
+}
+
+.watchlist-comments-list {
+  margin-top: 0.5rem;
+}
+
+/* Share / post watchlist (on My watchlist page) */
+.watchlist-share-section {
+  margin-bottom: 2rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 14px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.watchlist-share-section h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+}
+
+.watchlist-share-desc {
+  margin: 0 0 1rem;
+  color: #b9c5e8;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.watchlist-share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.watchlist-share-hint {
+  font-size: 0.85rem;
+  margin: 0;
 }
 
 @media (max-width: 700px) {

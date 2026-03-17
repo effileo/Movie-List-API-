@@ -10,6 +10,7 @@ import TmdbMovie from './pages/TmdbMovie.jsx';
 import MovieListPage from './pages/MovieListPage.jsx';
 import Profile from './pages/Profile.jsx';
 import PublicWatchlist from './pages/PublicWatchlist.jsx';
+import DiscoverWatchlists from './pages/DiscoverWatchlists.jsx';
 import './App.css';
 
 function Nav() {
@@ -22,12 +23,14 @@ function Nav() {
           <>
             <Link to="/search">Search</Link>
             <Link to="/watchlist">Watchlist</Link>
+            <Link to="/discover">Discover</Link>
             <Link to="/profile">Profile</Link>
             <span className="nav-user">{user.name}</span>
             <button type="button" className="nav-btn" onClick={logout}>Log out</button>
           </>
         ) : (
           <>
+            <Link to="/discover">Discover</Link>
             <Link to="/login">Log in</Link>
             <Link to="/register">Register</Link>
           </>
@@ -50,6 +53,7 @@ export default function App() {
             <Route path="/search" element={<Search />} />
             <Route path="/watchlist" element={<Watchlist />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/discover" element={<DiscoverWatchlists />} />
             <Route path="/users/:id" element={<Profile />} />
             <Route path="/users/:id/watchlist" element={<PublicWatchlist />} />
             <Route path="/movies/list/:listType" element={<MovieListPage />} />

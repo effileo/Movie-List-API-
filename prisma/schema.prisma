@@ -23,10 +23,14 @@ model user{
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   //relations
-  watchListItems watchListItem[]
-  movies         movie[]
-  reviews        review[]
-  comments       comment[]
+  watchListItems        watchListItem[]
+  movies                movie[]
+  reviews               review[]
+  comments              comment[]
+  watchlistCommentsSent watchlistComment[]     @relation("WatchlistCommentAuthor")
+  watchlistCommentsRecv watchlistComment[]     @relation("WatchlistCommentTarget")
+  watchlistLikesGiven   watchlistLike[]        @relation("WatchlistLikeUser")
+  watchlistLikesRecv    watchlistLike[]        @relation("WatchlistLikeTarget")
 }
 model movie{
   id          String   @id @default(uuid())
@@ -89,4 +93,23 @@ model comment{
   createdAt DateTime @default(now())
   user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
   movie     movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+}
+
+model watchlistComment{
+  id           String   @id @default(uuid())
+  userId       Int
+  targetUserId Int
+  text         String
+  createdAt    DateTime @default(now())
+  user         user     @relation("WatchlistCommentAuthor", fields: [userId], references: [id], onDelete: Cascade)
+  targetUser   user     @relation("WatchlistCommentTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
+}
+
+model watchlistLike{
+  userId       Int
+  targetUserId Int
+  createdAt    DateTime @default(now())
+  user         user     @relation("WatchlistLikeUser", fields: [userId], references: [id], onDelete: Cascade)
+  targetUser   user     @relation("WatchlistLikeTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
+  @@id([userId, targetUserId])
 }

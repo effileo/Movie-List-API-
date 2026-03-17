@@ -24,6 +24,45 @@ export function getPublicProfile(prisma) {
     };
 }
 
+/**
+ * GET /users/feed/watchlists – list of public watchlists (for Discover feed).
+ * Returns users who have watchlistPublic true and at least one watchlist item, with like/comment counts.
+ */
+export function getWatchlistFeed(prisma) {
+    return async (req, res) => {
+        const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 20));
+        const users = await prisma.user.findMany({
+            where: {
+                watchlistPublic: true,
+                watchListItems: { some: {} },
+            },
+            select: {
+                id: true,
+                name: true,
+                avatarUrl: true,
+                _count: {
+                    select: {
+                        watchListItems: true,
+                        watchlistLikesRecv: true,
+                        watchlistCommentsRecv: true,
+                    },
+                },
+            },
+            orderBy: { createdAt: 'desc' },
+            take: limit,
+        });
+        const data = users.map((u) => ({
+            id: u.id,
+            name: u.name,
+            avatarUrl: u.avatarUrl,
+            movieCount: u._count.watchListItems,
+            likeCount: u._count.watchlistLikesRecv,
+            commentCount: u._count.watchlistCommentsRecv,
+        }));
+        res.json({ status: 'success', data });
+    };
+}
+
 /** GET /users/:id/watchlist – public watchlist if user has watchlistPublic true. */
 export function getPublicWatchlist(prisma) {
     return async (req, res) => {

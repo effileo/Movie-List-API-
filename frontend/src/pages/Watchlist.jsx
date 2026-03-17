@@ -1,13 +1,25 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { apiRoutes, TMDB_IMG } from '../api/client.js';
+import { useAuth } from '../context/AuthContext.jsx';
 import './Movies.css';
 
 export default function Watchlist() {
+  const { user: me } = useAuth();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [updating, setUpdating] = useState(null);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const publicWatchlistUrl = me?.id ? `${window.location.origin}/users/${me.id}/watchlist` : null;
+  function copyShareLink() {
+    if (!publicWatchlistUrl) return;
+    navigator.clipboard.writeText(publicWatchlistUrl).then(() => {
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    });
+  }
 
   useEffect(() => {
     (async () => {
@@ -52,6 +64,28 @@ export default function Watchlist() {
   return (
     <div className="movies-page">
       <h1>My watchlist</h1>
+
+      {/* Post / Share watchlist – others can like & comment */}
+      {me && (
+        <section className="watchlist-share-section">
+          <h2>Share your watchlist</h2>
+          <p className="watchlist-share-desc">
+            Post your watchlist so others can view it, like it, and leave comments. When your watchlist is public, anyone with the link can interact with it.
+          </p>
+          <div className="watchlist-share-actions">
+            <Link to={`/users/${me.id}/watchlist`} className="btn btn-secondary">
+              View my public watchlist
+            </Link>
+            {publicWatchlistUrl && (
+              <button type="button" className="btn btn-ghost btn-sm" onClick={copyShareLink}>
+                {linkCopied ? 'Copied!' : 'Copy link'}
+              </button>
+            )}
+          </div>
+          <p className="muted watchlist-share-hint">Turn "Watchlist public" on in your profile to allow others to see it.</p>
+        </section>
+      )}
+
       {items.length === 0 ? (
         <p className="movies-message">Your watchlist is empty. <Link to="/search">Search movies</Link> to add some.</p>
       ) : (

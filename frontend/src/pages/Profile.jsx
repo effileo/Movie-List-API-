@@ -114,8 +114,17 @@ export default function Profile() {
           ) : (
             <p className="muted">{isOwn ? 'Your watchlist is empty.' : 'No movies in this list.'}</p>
           )}
-          {isOwn && <Link to="/watchlist" className="btn btn-small">View full watchlist</Link>}
-          {!isOwn && displayUser?.watchlistPublic && watchlist?.length > 0 && <Link to={`/users/${displayUser.id}/watchlist`} className="btn btn-small">View full watchlist</Link>}
+          {isOwn && (
+            <>
+              <Link to="/watchlist" className="btn btn-small">View full watchlist</Link>
+              {displayUser?.watchlistPublic && (
+                <Link to={`/users/${displayUser.id}/watchlist`} className="btn btn-small btn-ghost">Share watchlist (others can like & comment)</Link>
+              )}
+            </>
+          )}
+          {!isOwn && displayUser?.watchlistPublic && watchlist?.length > 0 && (
+            <Link to={`/users/${displayUser.id}/watchlist`} className="btn btn-small">View full watchlist · Like & comment</Link>
+          )}
         </section>
       )}
     </div>
