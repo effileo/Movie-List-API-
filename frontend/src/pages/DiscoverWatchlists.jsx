@@ -28,29 +28,36 @@ export default function DiscoverWatchlists() {
       {feed.length === 0 ? (
         <p className="muted">No public watchlists yet. Be the first to share yours from your watchlist page.</p>
       ) : (
-        <div className="discover-grid">
+        <div className="discover-feed">
           {feed.map((user) => (
             <Link
               to={`/users/${user.id}/watchlist`}
               key={user.id}
-              className="discover-card"
+              className="discover-post"
             >
-              <div className="discover-card-avatar">
-                {user.avatarUrl ? (
-                  <img src={user.avatarUrl} alt="" />
-                ) : (
-                  <div className="discover-card-avatar-placeholder" />
-                )}
+              <header className="discover-post-header">
+                <div className="discover-post-avatar">
+                  {user.avatarUrl ? (
+                    <img src={user.avatarUrl} alt="" />
+                  ) : (
+                    <div className="discover-post-avatar-placeholder" />
+                  )}
+                </div>
+                <div className="discover-post-user">
+                  <span className="discover-post-name">{user.name}</span>
+                  <span className="discover-post-label">shared their watchlist</span>
+                </div>
+              </header>
+              <div className="discover-post-body">
+                <p className="discover-post-stats">
+                  <span>{user.movieCount} {user.movieCount === 1 ? 'movie' : 'movies'}</span>
+                  <span className="discover-post-engagement">
+                    <span>❤️ {user.likeCount}</span>
+                    <span>💬 {user.commentCount}</span>
+                  </span>
+                </p>
+                <span className="discover-post-cta">View watchlist · like & comment</span>
               </div>
-              <h2 className="discover-card-name">{user.name}</h2>
-              <p className="discover-card-meta">
-                {user.movieCount} {user.movieCount === 1 ? 'movie' : 'movies'}
-                {' · '}
-                ❤️ {user.likeCount} {user.likeCount === 1 ? 'like' : 'likes'}
-                {' · '}
-                💬 {user.commentCount} {user.commentCount === 1 ? 'comment' : 'comments'}
-              </p>
-              <span className="discover-card-cta">View watchlist & interact →</span>
             </Link>
           ))}
         </div>
