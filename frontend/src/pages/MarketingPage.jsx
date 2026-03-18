@@ -1,7 +1,7 @@
-import React from 'react';
+﻿import React from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { SparklesIcon, UsersIcon, LayersIcon } from 'lucide-react';
+import { SparklesIcon, UsersIcon } from 'lucide-react';
 import Starfield from '../components/Starfield';
 import PosterVortex from '../components/PosterVortex';
 
@@ -112,17 +112,7 @@ export default function MarketingPage() {
             </p>
           </div>
 
-          {/* Card 3: 3D Collections */}
-          <div className="md:col-span-3 relative overflow-hidden rounded-3xl bg-white/5 border border-white/10 p-10 group hover:bg-white/10 transition-colors flex flex-col md:flex-row items-center justify-between">
-            <div className="absolute top-1/2 left-1/2 w-full h-full -translate-x-1/2 -translate-y-1/2 bg-pink-500/5 rounded-full blur-[120px] -z-10 group-hover:bg-pink-500/10 transition-colors" />
-            <div className="max-w-xl">
-              <LayersIcon className="w-12 h-12 text-pink-400 mb-6" />
-              <h3 className="text-3xl font-bold mb-4">Interactive 3D Views</h3>
-              <p className="text-white/60 text-lg leading-relaxed">
-                Experience the cinematic UI. Every poster tilts, every background fades dynamically. It’s like browsing a premium streaming app, built just for you.
-              </p>
-            </div>
-          </div>
+
 
         </div>
       </section>
