@@ -33,16 +33,44 @@ model user{
   watchlistLikesRecv    watchlistLike[]        @relation("WatchlistLikeTarget")
   followers             follow[]               @relation("FollowedUser")
   following             follow[]               @relation("FollowingUser")
+  notifications         notification[]         @relation("NotificationTo")
+  fromNotifications     notification[]         @relation("NotificationFrom")
 }
 
 model follow {
   followerId  Int
   followedId  Int
+  status      FollowStatus @default(PENDING)
   createdAt   DateTime @default(now())
   follower    user     @relation("FollowingUser", fields: [followerId], references: [id], onDelete: Cascade)
   followed    user     @relation("FollowedUser", fields: [followedId], references: [id], onDelete: Cascade)
 
   @@id([followerId, followedId])
+}
+
+enum FollowStatus {
+  PENDING
+  ACCEPTED
+}
+
+model notification {
+  id          String   @id @default(uuid())
+  userId      Int
+  type        NotificationType
+  fromUserId  Int?
+  data        Json?    // For extra info like movieId or commentId
+  message     String
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  user        user     @relation("NotificationTo", fields: [userId], references: [id], onDelete: Cascade)
+  fromUser    user?    @relation("NotificationFrom", fields: [fromUserId], references: [id], onDelete: SetNull)
+}
+
+enum NotificationType {
+  FOLLOW_REQUEST
+  FOLLOW_ACCEPTED
+  LIKE_WATCHLIST
+  COMMENT_WATCHLIST
 }
 model movie{
   id          String   @id @default(uuid())

@@ -1,5 +1,5 @@
 import express from 'express';
-import { getPublicProfile, getPublicWatchlist, getWatchlistFeed, getUserPreview, toggleFollow, getTopGenres } from '../controllers/usercontroller.js';
+import { getPublicProfile, getPublicWatchlist, getWatchlistFeed, getUserPreview, toggleFollow, getTopGenres, getNotifications, markNotificationsAsRead, respondToFollowRequest } from '../controllers/usercontroller.js';
 import { getActivityFeed } from '../controllers/feedcontroller.js';
 import {
     listWatchlistComments,
@@ -24,8 +24,13 @@ function userRoutes(prisma) {
     /** Discoverable genres for filtering */
     router.get('/discover/genres', getTopGenres(prisma));
 
-    /** Follow/Unfollow */
+    /** Follow/Unfollow & Requests */
     router.post('/:id/follow', authMiddleware, toggleFollow(prisma));
+    router.post('/:id/follow/respond', authMiddleware, respondToFollowRequest(prisma));
+
+    /** Notifications */
+    router.get('/notifications', authMiddleware, getNotifications(prisma));
+    router.post('/notifications/read', authMiddleware, markNotificationsAsRead(prisma));
 
     /** Watchlist engagement: comments and likes (more specific routes first) */
     router.get('/:id/watchlist/comments', listWatchlistComments(prisma));

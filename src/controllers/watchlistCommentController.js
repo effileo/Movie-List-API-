@@ -36,6 +36,17 @@ export function createWatchlistComment(prisma) {
             data: { userId, targetUserId, text },
             include: { user: { select: { id: true, name: true, avatarUrl: true } } },
         });
+
+        // Notify the target user
+        await prisma.notification.create({
+            data: {
+                userId: targetUserId,
+                fromUserId: userId,
+                type: 'COMMENT_WATCHLIST',
+                message: `${req.user.name} commented on your watchlist!`,
+            }
+        });
+
         res.status(201).json({ status: 'success', data: comment });
     };
 }

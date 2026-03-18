@@ -40,6 +40,11 @@ export function getWatchlistFeed(prisma) {
                 id: true,
                 name: true,
                 avatarUrl: true,
+                watchlistPublic: true,
+                followers: {
+                  where: { followerId: req.user?.id || 0 },
+                  select: { status: true }
+                },
                 _count: {
                     select: {
                         watchListItems: true,
@@ -50,7 +55,7 @@ export function getWatchlistFeed(prisma) {
                 watchListItems: {
                     take: 3,
                     orderBy: { createdAt: 'desc' },
-                    include: { movie: { select: { posterPath: true, title: true } } },
+                    include: { movie: { select: { posterPath: true, title: true, genre: true } } },
                 },
             },
             orderBy: { createdAt: 'desc' },
@@ -60,12 +65,14 @@ export function getWatchlistFeed(prisma) {
             id: u.id,
             name: u.name,
             avatarUrl: u.avatarUrl,
+            followStatus: (u.followers?.length > 0) ? u.followers[0].status : null,
             movieCount: u._count.watchListItems,
             likeCount: u._count.watchlistLikesRecv,
             commentCount: u._count.watchlistCommentsRecv,
             previewMovies: u.watchListItems.map((item) => ({
                 posterPath: item.movie.posterPath,
                 title: item.movie.title,
+                genre: item.movie.genre,
             })),
         }));
         res.json({ status: 'success', data });
@@ -73,7 +80,7 @@ export function getWatchlistFeed(prisma) {
 }
 
 /**
- * POST /users/:id/follow – Follow/unfollow a user.
+ * POST /users/:id/follow – Request to follow a user (creates PENDING follow + notification).
  */
 export function toggleFollow(prisma) {
     return async (req, res) => {
@@ -87,16 +94,108 @@ export function toggleFollow(prisma) {
         });
 
         if (existing) {
+            // If already exists (pending or accepted), we unfollow/cancel
             await prisma.follow.delete({
                 where: { followerId_followedId: { followerId, followedId } },
             });
-            return res.json({ status: 'success', followed: false });
-        } else {
-            await prisma.follow.create({
-                data: { followerId, followedId },
+            // Also delete the notification if it was still pending
+            await prisma.notification.deleteMany({
+                where: { userId: followedId, fromUserId: followerId, type: 'FOLLOW_REQUEST' }
             });
-            return res.json({ status: 'success', followed: true });
+            return res.json({ status: 'success', followed: false, statusText: 'unfollowed' });
+        } else {
+            // Create a pending follow request
+            await prisma.follow.create({
+                data: { followerId, followedId, status: 'PENDING' },
+            });
+            // Create notification for the followed user
+            await prisma.notification.create({
+                data: {
+                    userId: followedId,
+                    fromUserId: followerId,
+                    type: 'FOLLOW_REQUEST',
+                    message: `${req.user.name} requested to follow you.`,
+                }
+            });
+            return res.json({ status: 'success', followed: true, statusText: 'pending' });
         }
+    };
+}
+
+/**
+ * POST /users/:id/follow/respond – Accept or decline a follow request.
+ */
+export function respondToFollowRequest(prisma) {
+    return async (req, res) => {
+        const userId = req.user.id; // The person being followed
+        const requesterId = parseInt(req.params.id, 10);
+        const { action } = req.body; // 'accept' or 'decline'
+
+        if (action === 'accept') {
+            await prisma.follow.update({
+                where: { followerId_followedId: { followerId: requesterId, followedId: userId } },
+                data: { status: 'ACCEPTED' },
+            });
+            // Notify the requester that they were accepted
+            await prisma.notification.create({
+                data: {
+                    userId: requesterId,
+                    fromUserId: userId,
+                    type: 'FOLLOW_ACCEPTED',
+                    message: `${req.user.name} accepted your follow request.`,
+                }
+            });
+        } else {
+            await prisma.follow.delete({
+                where: { followerId_followedId: { followerId: requesterId, followedId: userId } },
+            });
+        }
+
+        // Mark the original request notification as read
+        await prisma.notification.updateMany({
+            where: { userId, fromUserId: requesterId, type: 'FOLLOW_REQUEST' },
+            data: { isRead: true }
+        });
+
+        res.json({ status: 'success', action });
+    };
+}
+
+/**
+ * GET /users/notifications – Fetch unread notifications for the current user.
+ */
+export function getNotifications(prisma) {
+    return async (req, res) => {
+        try {
+            const userId = req.user.id;
+            const notifications = await prisma.notification.findMany({
+                where: { userId, isRead: false },
+                orderBy: { createdAt: 'desc' },
+                include: {
+                    // Include requester info for follow requests
+                    fromUser: { select: { name: true, avatarUrl: true } }
+                }
+            });
+            res.json({ status: 'success', data: notifications });
+        } catch (err) {
+            console.error('getNotifications ERROR:', err.message);
+            console.error(err.stack);
+            res.status(500).json({ error: err.message });
+        }
+    };
+}
+
+/**
+ * POST /users/notifications/read – Mark all notifications for the user as read.
+ */
+export function markNotificationsAsRead(prisma) {
+    return async (req, res) => {
+        const userId = req.user.id;
+        await prisma.notification.updateMany({
+            where: { userId },
+            data: { isRead: true },
+        });
+        res.json({ status: 'success' });
     };
 }
 
@@ -112,9 +211,11 @@ export function getTopGenres(prisma) {
 
         const genreCounts = {};
         publicMovies.forEach((item) => {
-            item.movie.genre.forEach((g) => {
-                genreCounts[g] = (genreCounts[g] || 0) + 1;
-            });
+            if (item.movie?.genre) {
+                item.movie.genre.forEach((g) => {
+                    genreCounts[g] = (genreCounts[g] || 0) + 1;
+                });
+            }
         });
 
         const sortedGenres = Object.entries(genreCounts)

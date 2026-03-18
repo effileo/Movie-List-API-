@@ -31,6 +31,9 @@ export const apiRoutes = {
     watchlistFeed: (limit = 20) => api(`/users/feed/watchlists?limit=${limit}`),
     topGenres: () => api('/users/discover/genres'),
     follow: (id) => api(`/users/${id}/follow`, { method: 'POST' }),
+    followAction: (id, action) => api(`/users/${id}/follow/respond`, { method: 'POST', body: JSON.stringify({ action }) }),
+    getNotifications: () => api('/users/notifications'),
+    markNotificationsRead: () => api('/users/notifications/read', { method: 'POST' }),
 
     watchlist: (id) => api(`/users/${id}/watchlist`),
     watchlistComments: (id) => api(`/users/${id}/watchlist/comments`),

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link, useNavigate, Navigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -16,17 +16,47 @@ import Profile from './pages/Profile.jsx';
 import PublicWatchlist from './pages/PublicWatchlist.jsx';
 import DiscoverWatchlists from './pages/DiscoverWatchlists.jsx';
 import CineVault from './pages/CineVault.jsx';
-import { FilmIcon, SearchIcon, UserIcon, LogOutIcon, ArchiveIcon } from 'lucide-react';
+import { FilmIcon, SearchIcon, UserIcon, LogOutIcon, ArchiveIcon, BellIcon } from 'lucide-react';
+import { ToastProvider, useToast } from './components/ui/ToastProvider.jsx';
+import NotificationDropdown from './components/notifications/NotificationDropdown.jsx';
+import { apiRoutes } from './api/client.js';
 import './App.css';
+
 
 // Sleek glassmorphic Navbar
 function Nav() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { showToast } = useToast();
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Poll for notifications
+  useEffect(() => {
+    if (!user) return;
+    
+    const checkNotifications = async () => {
+      try {
+        const res = await apiRoutes.users.getNotifications();
+        const count = res.data?.length || 0;
+        if (count > unreadCount) {
+          // Could play a subtle sound or just let the red dot handle it
+        }
+        setUnreadCount(count);
+      } catch (err) {
+        console.error('Notification check failed', err);
+      }
+    };
+
+    checkNotifications();
+    const interval = setInterval(checkNotifications, 30000); // 30s
+    return () => clearInterval(interval);
+  }, [user, unreadCount]);
 
   async function handleLogout() {
     await logout();
     navigate('/', { replace: true });
+    showToast('Logged out successfully');
   }
 
   return (
@@ -52,6 +82,23 @@ function Nav() {
                 <ArchiveIcon className="w-4 h-4" /> Vault
               </Link>
               <Link to="/discover" className="text-cinematic-muted hover:text-white transition-colors">Discover</Link>
+              
+              <div className="relative">
+                <button 
+                  onClick={() => setIsNotifOpen(!isNotifOpen)}
+                  className="relative p-2 rounded-xl text-cinematic-muted hover:text-white hover:bg-white/5 transition-all"
+                >
+                  <BellIcon className="w-5 h-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#0f172a] shadow-[0_0_10px_rgba(239,68,68,0.5)] anim-pulse" />
+                  )}
+                </button>
+                <NotificationDropdown 
+                  isOpen={isNotifOpen} 
+                  onClose={() => setIsNotifOpen(false)} 
+                />
+              </div>
+
               <Link to="/profile" className="flex items-center gap-2 px-4 py-2 rounded-full border border-cinematic-border bg-cinematic-surface text-white hover:bg-white/10 transition-colors">
                 <UserIcon className="w-4 h-4" /> {user.name}
               </Link>
@@ -107,6 +154,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+      <ToastProvider>
         {/* Expose background setter via context if needed, or window for deep components */}
       <div 
         className="relative min-h-screen w-full bg-cinematic-bg text-cinematic-text overflow-hidden selection:bg-cinematic-accent selection:text-white"
@@ -174,6 +222,7 @@ export default function App() {
           </main>
         </div>
       </div>
+      </ToastProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );

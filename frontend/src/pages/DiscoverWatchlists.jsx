@@ -1,11 +1,14 @@
 import { useState, useEffect, useMemo } from 'react';
 import { apiRoutes } from '../api/client.js';
+
+import { useAuth } from '../context/AuthContext.jsx';
 import TagCloud from '../components/discover/TagCloud.jsx';
 import WatchlistCard from '../components/discover/WatchlistCard.jsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import './DiscoverWatchlists.css';
 
 export default function DiscoverWatchlists() {
+  const { user: currentUser } = useAuth();
   const [feed, setFeed] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -20,16 +23,17 @@ export default function DiscoverWatchlists() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Filter feed based on activeTag (client-side for now, but could be server-side)
+  // Filter feed based on activeTag and hide current user
   const filteredFeed = useMemo(() => {
-    if (!activeTag) return feed;
-    return feed.filter(user => 
-      user.previewMovies?.some(m => m.genres?.includes(activeTag)) || 
-      // Note: In a real app, we'd fetch filtered data from the server or have genres in the feed item.
-      // For this refinement, let's assume we want to filter by the user's top genres.
-      true // Default to true if we don't have perfect genre data on each card yet
+    let result = feed;
+    if (currentUser) {
+      result = result.filter(u => u.id !== currentUser.id);
+    }
+    if (!activeTag) return result;
+    return result.filter(u => 
+      u.previewMovies?.some(m => m.genres?.includes(activeTag))
     );
-  }, [feed, activeTag]);
+  }, [feed, activeTag, currentUser]);
 
   if (loading && feed.length === 0) {
     return (

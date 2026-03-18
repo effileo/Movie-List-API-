@@ -56,6 +56,17 @@ export function toggleWatchlistLike(prisma) {
         await prisma.watchlistLike.create({
             data: { userId, targetUserId },
         });
+        
+        // Notify the target user
+        await prisma.notification.create({
+            data: {
+                userId: targetUserId,
+                fromUserId: userId,
+                type: 'LIKE_WATCHLIST',
+                message: `${req.user.name} liked your watchlist!`,
+            }
+        });
+
         const likeCount = await prisma.watchlistLike.count({ where: { targetUserId } });
         return res.json({ status: 'success', data: { liked: true, likeCount } });
     };
