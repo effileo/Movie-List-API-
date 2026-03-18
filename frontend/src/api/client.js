@@ -57,6 +57,7 @@ export const apiRoutes = {
   },
   watchlist: {
     list: () => api('/watchlist'),
+    vault: () => api('/watchlist/vault'),
     add: (body) => api('/watchlist', { method: 'POST', body: JSON.stringify(body) }),
     update: (id, body) => api(`/watchlist/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
     remove: (id) => api(`/watchlist/${id}`, { method: 'DELETE' }),

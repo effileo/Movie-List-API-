@@ -15,7 +15,8 @@ import MovieListPage from './pages/MovieListPage.jsx';
 import Profile from './pages/Profile.jsx';
 import PublicWatchlist from './pages/PublicWatchlist.jsx';
 import DiscoverWatchlists from './pages/DiscoverWatchlists.jsx';
-import { FilmIcon, SearchIcon, UserIcon, LogOutIcon } from 'lucide-react';
+import CineVault from './pages/CineVault.jsx';
+import { FilmIcon, SearchIcon, UserIcon, LogOutIcon, ArchiveIcon } from 'lucide-react';
 import './App.css';
 
 // Sleek glassmorphic Navbar
@@ -47,6 +48,9 @@ function Nav() {
                 <SearchIcon className="w-4 h-4" /> Search
               </Link>
               <Link to="/watchlist" className="text-cinematic-muted hover:text-white transition-colors">Watchlist</Link>
+              <Link to="/vault" className="text-cinematic-muted hover:text-white transition-colors flex items-center gap-1.5">
+                <ArchiveIcon className="w-4 h-4" /> Vault
+              </Link>
               <Link to="/discover" className="text-cinematic-muted hover:text-white transition-colors">Discover</Link>
               <Link to="/profile" className="flex items-center gap-2 px-4 py-2 rounded-full border border-cinematic-border bg-cinematic-surface text-white hover:bg-white/10 transition-colors">
                 <UserIcon className="w-4 h-4" /> {user.name}
@@ -159,6 +163,7 @@ export default function App() {
                 <Route path="/watchlist" element={<AuthGuard requireAuth={true}><Watchlist /></AuthGuard>} />
                 <Route path="/profile" element={<AuthGuard requireAuth={true}><Profile /></AuthGuard>} />
                 <Route path="/discover" element={<AuthGuard requireAuth={true}><DiscoverWatchlists /></AuthGuard>} />
+                <Route path="/vault" element={<AuthGuard requireAuth={true}><CineVault /></AuthGuard>} />
                 <Route path="/users/:id" element={<Profile />} />
                 <Route path="/users/:id/watchlist" element={<PublicWatchlist />} />
                 <Route path="/movies/list/:listType" element={<MovieListPage />} />
