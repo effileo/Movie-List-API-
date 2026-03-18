@@ -47,6 +47,11 @@ export function getWatchlistFeed(prisma) {
                         watchlistCommentsRecv: true,
                     },
                 },
+                watchListItems: {
+                    take: 3,
+                    orderBy: { createdAt: 'desc' },
+                    include: { movie: { select: { posterPath: true, title: true } } },
+                },
             },
             orderBy: { createdAt: 'desc' },
             take: limit,
@@ -58,8 +63,66 @@ export function getWatchlistFeed(prisma) {
             movieCount: u._count.watchListItems,
             likeCount: u._count.watchlistLikesRecv,
             commentCount: u._count.watchlistCommentsRecv,
+            previewMovies: u.watchListItems.map((item) => ({
+                posterPath: item.movie.posterPath,
+                title: item.movie.title,
+            })),
         }));
         res.json({ status: 'success', data });
+    };
+}
+
+/**
+ * POST /users/:id/follow – Follow/unfollow a user.
+ */
+export function toggleFollow(prisma) {
+    return async (req, res) => {
+        const followerId = req.user.id;
+        const followedId = parseInt(req.params.id, 10);
+        if (Number.isNaN(followedId)) return res.status(400).json({ error: 'Invalid user id' });
+        if (followerId === followedId) return res.status(400).json({ error: 'Cannot follow yourself' });
+
+        const existing = await prisma.follow.findUnique({
+            where: { followerId_followedId: { followerId, followedId } },
+        });
+
+        if (existing) {
+            await prisma.follow.delete({
+                where: { followerId_followedId: { followerId, followedId } },
+            });
+            return res.json({ status: 'success', followed: false });
+        } else {
+            await prisma.follow.create({
+                data: { followerId, followedId },
+            });
+            return res.json({ status: 'success', followed: true });
+        }
+    };
+}
+
+/**
+ * GET /users/discover/genres – Aggregates most common genres from public watchlists.
+ */
+export function getTopGenres(prisma) {
+    return async (req, res) => {
+        const publicMovies = await prisma.watchListItem.findMany({
+            where: { user: { watchlistPublic: true } },
+            include: { movie: { select: { genre: true } } },
+        });
+
+        const genreCounts = {};
+        publicMovies.forEach((item) => {
+            item.movie.genre.forEach((g) => {
+                genreCounts[g] = (genreCounts[g] || 0) + 1;
+            });
+        });
+
+        const sortedGenres = Object.entries(genreCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 10)
+            .map(([genre]) => genre);
+
+        res.json({ status: 'success', data: sortedGenres });
     };
 }
 

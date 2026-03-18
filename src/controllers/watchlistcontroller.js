@@ -112,4 +112,64 @@ const getMyWatchlist = (prisma) => async (req, res) => {
     return res.status(200).json({ status: 'success', data: items });
 };
 
-export { addToWatchList, deleteFromWatchlist, updateWatchlistItem, getMyWatchlist };
+
+/**
+ * POST /watchlist/clone/:targetUserId – Copies all movies from target user's public watchlist.
+ */
+const cloneWatchlist = (prisma) => async (req, res) => {
+    const userId = Number(req.user.id);
+    const targetUserId = parseInt(req.params.targetUserId, 10);
+
+    if (Number.isNaN(targetUserId)) return res.status(400).json({ error: 'Invalid user id' });
+    if (userId === targetUserId) return res.status(400).json({ error: 'Cannot clone your own watchlist' });
+
+    // Ensure target user has a public watchlist
+    const targetUser = await prisma.user.findUnique({
+        where: { id: targetUserId },
+        select: { watchlistPublic: true },
+    });
+
+    if (!targetUser || !targetUser.watchlistPublic) {
+        return res.status(403).json({ error: 'Target watchlist is private or user not found' });
+    }
+
+    // Get all movies from target user
+    const targetItems = await prisma.watchListItem.findMany({
+        where: { userId: targetUserId },
+        select: { movieId: true },
+    });
+
+    if (targetItems.length === 0) {
+        return res.status(400).json({ error: 'Target watchlist is empty' });
+    }
+
+    // Get current user's movie IDs to avoid duplicates
+    const myItems = await prisma.watchListItem.findMany({
+        where: { userId },
+        select: { movieId: true },
+    });
+    const myMovieIds = new Set(myItems.map((i) => i.movieId));
+
+    // Filter out movies already in our watchlist
+    const newItemsData = targetItems
+        .filter((item) => !myMovieIds.has(item.movieId))
+        .map((item) => ({
+            userId,
+            movieId: item.movieId,
+            status: 'PLANNED',
+        }));
+
+    if (newItemsData.length === 0) {
+        return res.json({ status: 'success', message: 'All movies are already in your watchlist' });
+    }
+
+    // Bulk create
+    await prisma.watchListItem.createMany({
+        data: newItemsData,
+        skipDuplicates: true,
+    });
+
+    return res.status(201).json({ status: 'success', clonedCount: newItemsData.length });
+};
+
+export { addToWatchList, deleteFromWatchlist, updateWatchlistItem, getMyWatchlist, cloneWatchlist };

@@ -1,124 +1,263 @@
 .discover-page {
-  max-width: 600px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1.25rem;
+  padding: 2rem 1.5rem;
+}
+
+.discover-header {
+  text-align: center;
+  margin-bottom: 3rem;
 }
 
 .discover-page h1 {
-  margin: 0 0 0.5rem;
-  font-size: 1.75rem;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .discover-intro {
-  color: #b9c5e8;
-  margin: 0 0 2rem;
-  font-size: 1rem;
-  line-height: 1.5;
+  color: #94a3b8;
+  max-width: 600px;
+  margin: 0 auto 2rem;
 }
 
-/* Feed: vertical list of posts (social-style) */
-.discover-feed {
+/* ── Tag Cloud ── */
+.tag-cloud {
   display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-/* Single post card – whole card is clickable */
-.discover-post {
-  display: block;
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 16px;
-  overflow: hidden;
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-}
-
-.discover-post:hover {
-  transform: translateY(-2px);
-  border-color: rgba(146, 190, 255, 0.4);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
-}
-
-/* Post header: profile at top (like social media) */
-.discover-post-header {
-  display: flex;
-  align-items: center;
   gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  overflow-x: auto;
+  padding: 0.5rem 0 1.5rem;
+  margin-bottom: 2rem;
+  scrollbar-width: none;
+  justify-content: center;
 }
+.tag-cloud::-webkit-scrollbar { display: none; }
 
-.discover-post-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  overflow: hidden;
-  flex-shrink: 0;
-  border: 2px solid rgba(255, 255, 255, 0.25);
-}
-
-.discover-post-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.discover-post-avatar-placeholder {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(145deg, #3f4e85, #1d2a52);
-}
-
-.discover-post-user {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  min-width: 0;
-}
-
-.discover-post-name {
-  font-weight: 600;
-  font-size: 1rem;
-  color: #e8eef8;
-}
-
-.discover-post-label {
+.tag-btn {
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
   font-size: 0.85rem;
-  color: #9ca8c9;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.tag-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+.tag-btn.active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
 }
 
-/* Post body: stats + CTA */
-.discover-post-body {
-  padding: 1rem 1.25rem;
+/* ── Masonry Grid ── */
+.discover-feed {
+  columns: 1;
+  column-gap: 1.5rem;
 }
 
-.discover-post-stats {
+@media (min-width: 640px) { .discover-feed { columns: 2; } }
+@media (min-width: 1024px) { .discover-feed { columns: 3; } }
+
+/* ── Watchlist Card ── */
+.watchlist-card {
+  break-inside: avoid;
+  margin-bottom: 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.watchlist-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Header inside card */
+.user-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 0 0 0.6rem;
-  font-size: 0.95rem;
-  color: #b9c5e8;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.discover-post-engagement {
+.user-info {
   display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatar-wrapper {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.user-avatar { width: 100%; height: 100%; object-fit: cover; }
+.initial-avatar {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 800; color: #fff;
+}
+
+.user-details { display: flex; flex-direction: column; gap: 0.1rem; }
+.user-name { font-weight: 600; font-size: 0.9rem; color: #fff; }
+.user-status { font-size: 0.7rem; color: #94a3b8; }
+
+.follow-btn {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.follow-btn:hover { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+.follow-btn.following { background: rgba(59, 130, 246, 0.5); color: #fff; }
+
+/* Body */
+.card-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  min-height: 200px;
+  justify-content: center;
+}
+
+.fan-stack {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  display: flex;
+  justify-content: center;
+}
+.fan-poster {
+  position: absolute;
+  top: 0;
+  width: 100px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.card-stats-overlay {
+  margin-top: 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* Hover Reveal */
+.card-hover-reveal {
+  padding: 0 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
-  color: #a9b5d7;
 }
 
-.discover-post-cta {
-  font-size: 0.9rem;
-  color: #92beff;
-  font-weight: 500;
+.hover-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.hover-title-chip {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  padding-left: 0.5rem;
+  border-left: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-.discover-post:hover .discover-post-cta {
-  text-decoration: underline;
+.view-collection-btn {
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  color: #fff;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+}
+
+/* Actions */
+.card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.left-actions { display: flex; gap: 1rem; }
+
+.action-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.action-btn:hover { color: #fff; }
+.like-btn.active { color: #f43f5e; box-shadow: none; }
+.clone-btn {
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+.clone-btn:hover { background: rgba(255, 255, 255, 0.1); }
+.clone-btn.success { background: #10b981; color: #fff; }
+
+/* ── Shimmer & Utils ── */
+.shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (max-width: 640px) {
+  .discover-page { padding: 1rem; }
+  .discover-feed { columns: 1; gap: 1rem; }
+  .fan-stack { height: 140px; }
+  .fan-poster { width: 80px; }
+  .card-body { min-height: 160px; }
 }

@@ -29,6 +29,9 @@ export const apiRoutes = {
   users: {
     get: (id) => api(`/users/${id}`),
     watchlistFeed: (limit = 20) => api(`/users/feed/watchlists?limit=${limit}`),
+    topGenres: () => api('/users/discover/genres'),
+    follow: (id) => api(`/users/${id}/follow`, { method: 'POST' }),
+
     watchlist: (id) => api(`/users/${id}/watchlist`),
     watchlistComments: (id) => api(`/users/${id}/watchlist/comments`),
     addWatchlistComment: (id, body) => api(`/users/${id}/watchlist/comments`, { method: 'POST', body: JSON.stringify(body) }),
@@ -58,6 +61,8 @@ export const apiRoutes = {
   watchlist: {
     list: () => api('/watchlist'),
     vault: () => api('/watchlist/vault'),
+    clone: (targetUserId) => api(`/watchlist/clone/${targetUserId}`, { method: 'POST' }),
+
     add: (body) => api('/watchlist', { method: 'POST', body: JSON.stringify(body) }),
     update: (id, body) => api(`/watchlist/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
     remove: (id) => api(`/watchlist/${id}`, { method: 'DELETE' }),
