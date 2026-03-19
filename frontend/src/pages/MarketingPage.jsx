@@ -1,9 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { SparklesIcon, UsersIcon } from 'lucide-react';
 import Starfield from '../components/Starfield';
 import PosterVortex from '../components/PosterVortex';
+import MarketingFeatureSections from '../components/marketing/MarketingFeatureSections.jsx';
 
 // The full-page marketing landing view for unauthenticated users
 export default function MarketingPage() {
@@ -25,16 +25,6 @@ export default function MarketingPage() {
         
         {/* Content on top of Vortex */}
         <div className="relative z-30 flex flex-col items-center text-center px-6 mt-[-10vh]">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 1 }}
-            className="flex items-center gap-3 mb-6 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md"
-          >
-            <SparklesIcon className="w-4 h-4 text-cinematic-accent" />
-            <span className="text-slate-400 text-sm font-semibold tracking-widest uppercase">The Next Evolution of Cinema Tracking</span>
-          </motion.div>
-
           <motion.h1 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -80,39 +70,7 @@ export default function MarketingPage() {
         </motion.div>
       </section>
 
-      {/* Beyond a Watchlist: Bento Grid Pitch */}
-      <section className="relative z-30 w-full max-w-7xl mx-auto px-6 py-32">
-        <div className="text-center mb-20">
-          <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">Beyond a Watchlist</h2>
-          <p className="text-white/50 text-xl font-light">The tools you need to build your ultimate cinema profile.</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-6 w-full auto-rows-[300px]">
-          
-          {/* Card 1: Social Pulse */}
-          <div className="md:col-span-2 relative overflow-hidden rounded-3xl bg-white/5 border border-white/10 p-10 group hover:bg-white/10 transition-colors">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-black/20 rounded-full blur-[100px] -z-10 transition-colors" />
-            <UsersIcon className="w-12 h-12 text-slate-400 mb-6" />
-            <h3 className="text-3xl font-bold mb-4">Social Pulse</h3>
-            <p className="text-white/60 text-lg leading-relaxed max-w-md">
-              A real-time, global feed of what your friends are adding, rating, and reviewing. Never miss a masterpiece again.
-            </p>
-          </div>
-
-          {/* Card 2: AI Matcher */}
-          <div className="relative overflow-hidden rounded-3xl bg-white/5 border border-white/10 p-10 group hover:bg-white/10 transition-colors">
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/20 rounded-full blur-[80px] -z-10 transition-colors" />
-            <SparklesIcon className="w-12 h-12 text-cinematic-accent mb-6" />
-            <h3 className="text-3xl font-bold mb-4">AI Matcher</h3>
-            <p className="text-white/60 text-lg leading-relaxed">
-              Our 'For You' engine analyzes your top actors and genres to find hidden gems perfectly tailored to your taste.
-            </p>
-          </div>
-
-
-
-        </div>
-      </section>
+      <MarketingFeatureSections />
 
       {/* Bottom CTA */}
       <section className="relative z-30 w-full py-32 text-center border-t border-white/5 bg-gradient-to-t from-white/[0.02] to-transparent">
