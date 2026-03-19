@@ -35,6 +35,18 @@ model user{
   following             follow[]               @relation("FollowingUser")
   notifications         notification[]         @relation("NotificationTo")
   fromNotifications     notification[]         @relation("NotificationFrom")
+  cineMatchLikes        cineMatchLike[]
+}
+
+model cineMatchLike {
+  userId    Int
+  tmdbId    Int
+  createdAt DateTime @default(now())
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tmdbId])
+  @@index([userId])
+  @@index([tmdbId])
 }
 
 model follow {

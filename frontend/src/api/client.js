@@ -79,6 +79,11 @@ export const apiRoutes = {
   feed: {
     activity: (limit = 30) => api(`/users/feed/activity?limit=${limit}`),
   },
+  cineMatch: {
+    friends: () => api('/cine-match/friends'),
+    stack: () => api('/cine-match/stack'),
+    swipe: (body) => api('/cine-match/swipe', { method: 'POST', body: JSON.stringify(body) }),
+  },
 };
 
 export const TMDB_IMG = 'https://image.tmdb.org/t/p/w500';

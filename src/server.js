@@ -13,6 +13,7 @@ import watchlistRoutes from './routes/watchlistRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
+import cineMatchRoutes from './routes/cineMatchRoutes.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
 
 config();
@@ -38,6 +39,7 @@ app.use('/watchlist', watchlistRoutes(prisma));
 app.use('/users', userRoutes(prisma));
 app.use('/reviews', reviewRoutes(prisma));
 app.use('/comments', commentRoutes(prisma));
+app.use('/cine-match', cineMatchRoutes(prisma));
 
 app.get('/health', async (req, res) => {
     try {

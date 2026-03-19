@@ -3,6 +3,7 @@ import HeroSection from '../components/HeroSection';
 import MovieRow from '../components/MovieRow';
 import ActivityFeed from '../components/ActivityFeed';
 import ForYouSection from '../components/ForYouSection';
+import CineMatchSection from '../components/cineMatch/CineMatchSection';
 
 export default function Landing() {
   // Grab the window-attached active backdrop setter established in App.jsx wrapper
@@ -49,6 +50,11 @@ export default function Landing() {
 
         <section className="px-6 md:px-16 mt-8">
           <ForYouSection />
+        </section>
+
+        {/* Cine-Match: swipe to match with a friend */}
+        <section className="px-6 md:px-16">
+          <CineMatchSection />
         </section>
 
         {/* Social Pulse Activity Feed */}
