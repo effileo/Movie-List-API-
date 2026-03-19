@@ -6,14 +6,12 @@ export default function Toast({ message, type = 'success', onClose }) {
     <CheckCircleIcon className="text-emerald-400" size={20} /> : 
     <XCircleIcon className="text-rose-400" size={20} />;
 
-  const glowClass = type === 'success' ? 'shadow-[0_0_20px_rgba(16,185,129,0.2)]' : 'shadow-[0_0_20px_rgba(244,63,94,0.2)]';
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 50, scale: 0.9 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-      className={`flex items-center gap-3 px-4 py-3 rounded-xl bg-[#0f172a]/90 backdrop-blur-xl border border-white/10 ${glowClass} min-w-[300px] pointer-events-auto`}
+      className="flex items-center gap-3 px-4 py-3 rounded-xl backdrop-blur-md bg-white/5 border border-white/10 shadow-[0_0_40px_-15px_rgba(0,0,0,0.5)] min-w-[300px] pointer-events-auto"
     >
       <div className="flex-shrink-0">{icon}</div>
       <p className="flex-grow text-sm font-medium text-slate-100">{message}</p>

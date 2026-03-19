@@ -60,10 +60,10 @@ function Nav() {
   }
 
   return (
-    <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-cinematic-bg/60 backdrop-blur-xl border-b border-cinematic-border/50 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+    <nav className="fixed top-0 w-full z-50 transition-all duration-300 backdrop-blur-md bg-white/5 border-b border-white/10 shadow-[0_0_40px_-15px_rgba(0,0,0,0.5)]">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-3 group">
-          <div className="p-2 rounded-xl bg-gradient-to-tr from-cinematic-accent to-purple-600 shadow-[0_0_20px_rgba(59,130,246,0.3)] group-hover:scale-105 transition-transform duration-300">
+          <div className="p-2 rounded-xl bg-cinematic-accent shadow-[0_0_40px_-15px_rgba(0,0,0,0.5)] group-hover:scale-105 transition-transform duration-300">
             <FilmIcon className="text-white w-5 h-5" />
           </div>
           <span className="text-xl font-bold tracking-widest text-white/90 group-hover:text-white transition-colors">
@@ -99,17 +99,17 @@ function Nav() {
                 />
               </div>
 
-              <Link to="/profile" className="flex items-center gap-2 px-4 py-2 rounded-full border border-cinematic-border bg-cinematic-surface text-white hover:bg-white/10 transition-colors">
+              <Link to="/profile" className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 text-white hover:bg-white/10 transition-colors">
                 <UserIcon className="w-4 h-4" /> {user.name}
               </Link>
-              <button type="button" onClick={handleLogout} className="text-cinematic-muted hover:text-red-400 transition-colors">
+              <button type="button" onClick={handleLogout} className="text-slate-400 hover:text-cinematic-accent transition-colors">
                 <LogOutIcon className="w-4 h-4" />
               </button>
             </>
           ) : (
             <>
               <Link to="/login" className="text-cinematic-muted hover:text-white transition-colors">Log in</Link>
-              <Link to="/register" className="px-5 py-2.5 rounded-full bg-cinematic-accent text-white hover:bg-blue-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all hover:scale-105">
+              <Link to="/register" className="px-5 py-2.5 rounded-full bg-cinematic-accent text-white hover:opacity-90 shadow-[0_0_40px_-15px_rgba(0,0,0,0.5)] transition-all hover:scale-105">
                 Register
               </Link>
             </>
@@ -157,7 +157,7 @@ export default function App() {
       <ToastProvider>
         {/* Expose background setter via context if needed, or window for deep components */}
       <div 
-        className="relative min-h-screen w-full bg-cinematic-bg text-cinematic-text overflow-hidden selection:bg-cinematic-accent selection:text-white"
+        className="relative min-h-screen w-full bg-cinematic-bg text-cinematic-text overflow-hidden selection:bg-cinematic-accent/30 selection:text-white"
         // We attach setActiveBackdrop to window so deeply nested components (like Landing) can trigger backdrops easily without heavy prop drilling.
         ref={(el) => { if (el) window.__setBackground = setActiveBackdrop; }}
       >

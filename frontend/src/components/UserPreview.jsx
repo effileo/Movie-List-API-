@@ -77,7 +77,7 @@ export default function UserPreview({ userId, children }) {
                             alt={tm.movie.title}
                             className="w-full h-full object-cover"
                           />
-                          <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-[9px] text-center py-0.5 font-bold text-yellow-400">
+                          <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-[9px] text-center py-0.5 font-bold text-cinematic-accent">
                             ★ {tm.rating}
                           </div>
                         </div>

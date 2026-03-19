@@ -1,10 +1,11 @@
+/* Premium Cinematic Noir – Landing */
+
 .landing {
   min-height: 80vh;
   position: relative;
   padding-bottom: 3rem;
 }
 
-/* Hero */
 .landing-hero {
   position: relative;
   padding: 4rem 1.5rem 4.5rem;
@@ -15,11 +16,11 @@
 .landing-hero-bg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #1a1f3a 0%, #0f1220 40%, #161b2e 100%);
+  background: linear-gradient(180deg, #0f172a 0%, #0a0a0c 50%, #050505 100%);
   background-image:
-    linear-gradient(135deg, rgba(30, 45, 90, 0.95) 0%, rgba(15, 18, 32, 0.98) 50%),
-    radial-gradient(ellipse 80% 50% at 70% 20%, rgba(80, 120, 200, 0.25), transparent),
-    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(120, 80, 180, 0.15), transparent);
+    linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(5, 5, 5, 1) 60%),
+    radial-gradient(ellipse 80% 50% at 70% 20%, rgba(0, 0, 0, 0.4), transparent),
+    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(0, 0, 0, 0.3), transparent);
 }
 
 .landing-hero-inner {
@@ -37,17 +38,14 @@
   font-size: clamp(2.2rem, 6vw, 3.5rem);
   margin: 0 0 1rem;
   line-height: 1.15;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.04em;
   font-weight: 700;
-  background: linear-gradient(180deg, #fff 0%, #c5d4f0 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #ffffff;
 }
 
 .landing-tagline {
   font-size: 1.15rem;
-  color: #a8b8dc;
+  color: #94a3b8;
   margin: 0 0 2.25rem;
   max-width: 520px;
   margin-left: auto;
@@ -69,22 +67,18 @@
   font-weight: 600;
 }
 
-.btn-ghost {
+.landing-actions .btn-ghost {
   background: transparent;
-  color: #a7cbff;
-  border: 1px solid rgba(146, 190, 255, 0.6);
-}
-
-.landing-actions .btn {
-  transition: transform 0.24s ease, box-shadow 0.24s ease;
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.4);
 }
 
 .landing-actions .btn:hover {
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 40px -15px rgba(0, 0, 0, 0.5);
 }
 
-/* Movie rows (Popular / Top rated) */
+/* Movie rows */
 .landing-row {
   max-width: 1280px;
   margin: 0 auto 3rem;
@@ -108,12 +102,13 @@
   margin: 0;
   font-size: 1.75rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.04em;
+  color: #ffffff;
 }
 
 .landing-view-all {
   font-size: 0.95rem;
-  color: #92beff;
+  color: #94a3b8;
   text-decoration: none;
   font-weight: 500;
   white-space: nowrap;
@@ -121,22 +116,21 @@
 
 .landing-view-all:hover {
   text-decoration: underline;
-  color: #b0ceff;
+  color: #ffffff;
 }
 
-.landing-row-subtitle {
+.landing-row-subtitle,
+.landing-row-loading {
   margin: 0;
   font-size: 0.95rem;
-  color: #8a9bc4;
+  color: #94a3b8;
 }
 
 .landing-row-loading {
-  color: #8a9bc4;
   padding: 2rem;
   text-align: center;
 }
 
-/* Vertical scrollable list of movie cards */
 .landing-movie-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -157,7 +151,7 @@
 }
 
 .landing-movie-list::-webkit-scrollbar-thumb {
-  background: rgba(146, 190, 255, 0.35);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 4px;
 }
 
@@ -166,23 +160,23 @@
   color: inherit;
   border-radius: 14px;
   overflow: hidden;
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  background: #16161a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 40px -15px rgba(0, 0, 0, 0.5);
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .landing-movie-card:hover {
   transform: scale(1.04);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
-  border-color: rgba(146, 190, 255, 0.4);
+  box-shadow: 0 0 40px -15px rgba(0, 0, 0, 0.6);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .landing-movie-poster {
   position: relative;
   aspect-ratio: 2/3;
   overflow: hidden;
-  background: linear-gradient(145deg, rgba(23, 32, 70, 0.95), rgba(56, 73, 130, 0.95));
+  background: linear-gradient(145deg, #0f172a, #050505);
 }
 
 .landing-movie-poster img {
@@ -197,7 +191,7 @@
   top: 0.5rem;
   right: 0.5rem;
   background: rgba(0, 0, 0, 0.8);
-  color: #ffd54f;
+  color: #e11d48;
   padding: 0.2rem 0.45rem;
   border-radius: 6px;
   font-size: 0.8rem;
@@ -212,6 +206,9 @@
   margin: 0 0 0.2rem;
   font-size: 0.95rem;
   line-height: 1.3;
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -220,10 +217,10 @@
 
 .landing-movie-info span {
   font-size: 0.85rem;
-  color: #8a9bc4;
+  color: #94a3b8;
 }
 
-/* Community reviews section */
+/* Community reviews */
 .landing-reviews .landing-row-title-wrap h2 {
   margin: 0;
 }
@@ -248,34 +245,34 @@
 }
 
 .landing-reviews .recommendations-grid::-webkit-scrollbar-thumb {
-  background: rgba(146, 190, 255, 0.35);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 4px;
 }
 
 .recommendation-card {
   display: flex;
   flex-direction: column;
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #16161a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
   overflow: hidden;
   text-decoration: none;
   color: inherit;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.24);
+  box-shadow: 0 0 40px -15px rgba(0, 0, 0, 0.5);
   transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .recommendation-card:hover {
   transform: translateY(-6px);
-  border-color: rgba(146, 190, 255, 0.5);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 40px -15px rgba(0, 0, 0, 0.6);
 }
 
 .recommendation-poster-wrap {
   position: relative;
   aspect-ratio: 2/3;
   overflow: hidden;
-  background: linear-gradient(145deg, rgba(23, 32, 70, 0.95), rgba(56, 73, 130, 0.95));
+  background: linear-gradient(145deg, #0f172a, #050505);
 }
 
 .recommendation-poster-wrap img {
@@ -290,7 +287,7 @@
   top: 0.5rem;
   right: 0.5rem;
   background: rgba(0, 0, 0, 0.75);
-  color: #ffd54f;
+  color: #e11d48;
   padding: 0.25rem 0.5rem;
   border-radius: 8px;
   font-size: 0.85rem;
@@ -309,26 +306,30 @@
   margin: 0;
   font-size: 1.05rem;
   line-height: 1.25;
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.recommendation-year {
+.recommendation-year,
+.recommendation-review-text {
   font-size: 0.9rem;
-  color: #a9b5d7;
+  color: #94a3b8;
 }
 
 .recommendation-review {
   margin-top: 0.5rem;
   padding-top: 0.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .recommendation-review-meta {
   font-size: 0.8rem;
-  color: #b9c5e8;
+  color: #94a3b8;
   display: block;
   margin-bottom: 0.25rem;
 }
@@ -336,7 +337,6 @@
 .recommendation-review-text {
   margin: 0;
   font-size: 0.85rem;
-  color: #a9b5d7;
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -349,13 +349,14 @@
   padding: 3.5rem 1.25rem;
   max-width: 1100px;
   margin: 0 auto;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .landing-features h2 {
   text-align: center;
   margin: 0 0 2rem;
   font-size: 1.7rem;
+  color: #ffffff;
 }
 
 .features-grid {
@@ -365,19 +366,19 @@
 }
 
 .feature-card {
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #16161a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
   padding: 1.5rem;
   text-align: center;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.24);
+  box-shadow: 0 0 40px -15px rgba(0, 0, 0, 0.5);
   transition: transform 0.3s ease, border-color 0.3s ease;
   transform-style: preserve-3d;
 }
 
 .feature-card:hover {
   transform: translateY(-8px) rotateX(6deg);
-  border-color: rgba(146, 190, 255, 0.65);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .feature-icon {
@@ -389,11 +390,12 @@
 .feature-card h3 {
   margin: 0 0 0.5rem;
   font-size: 1.1rem;
+  color: #ffffff;
 }
 
 .feature-card p {
   margin: 0;
-  color: #a9b5d7;
+  color: #94a3b8;
   font-size: 0.9rem;
   line-height: 1.4;
 }

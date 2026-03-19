@@ -55,10 +55,10 @@
   color: #fff;
 }
 .tag-btn.active {
-  background: #3b82f6;
-  border-color: #3b82f6;
+  background: var(--color-cinematic-accent, #e11d48);
+  border-color: var(--color-cinematic-accent, #e11d48);
   color: #fff;
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 40px -15px rgba(0, 0, 0, 0.5);
 }
 
 /* ── Masonry Grid ── */

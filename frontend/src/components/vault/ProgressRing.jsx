@@ -12,12 +12,10 @@ export default function ProgressRing({ completed, total, label }) {
   const offset = circumference * (1 - pct);
   const isComplete = total > 0 && completed >= total;
 
-  // Color based on completion
+  // Color: complete = green, in-progress = accent (Cine-Red)
   const strokeColor = isComplete
     ? '#22c55e'
-    : pct > 0.5
-      ? '#60a5fa'
-      : '#8b5cf6';
+    : '#e11d48';
 
   return (
     <div className="progress-ring-wrapper">

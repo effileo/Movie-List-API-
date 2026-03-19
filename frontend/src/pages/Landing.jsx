@@ -42,7 +42,7 @@ export default function Landing() {
               <h2 className="text-2xl md:text-3xl font-bold tracking-wide drop-shadow-md text-white">Popular Picks</h2>
               <p className="text-cinematic-muted text-sm mt-1">Highest viewing metrics right now</p>
             </div>
-            <div className="hidden md:block h-[1px] flex-1 mx-8 bg-gradient-to-r from-purple-500/50 to-transparent"></div>
+            <div className="hidden md:block h-[1px] flex-1 mx-8 bg-gradient-to-r from-white/10 to-transparent"></div>
           </div>
           <MovieRow endpoint="/api/movies/popular" onHoverBackdrop={setAppBackdrop} />
         </section>

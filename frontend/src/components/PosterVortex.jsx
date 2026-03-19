@@ -39,7 +39,7 @@ export default function PosterVortex() {
         {posters.map((movie, idx) => (
           <motion.div
             key={`${movie.id}-${idx}`}
-            className="w-full h-full rounded-2xl bg-cover bg-center shadow-2xl shadow-blue-500/10 border border-white/5"
+            className="w-full h-full rounded-2xl bg-cover bg-center shadow-[0_0_40px_-15px_rgba(0,0,0,0.5)] border border-white/5"
             style={{ backgroundImage: `url(${posterUrl(movie.poster_path)})` }}
             initial={{ y: Math.random() * 100 - 50 }}
             animate={{ 
@@ -52,7 +52,7 @@ export default function PosterVortex() {
       </motion.div>
       
       {/* Deep dark gradient overlay so it fades out at the edges and into the hero text */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#020205] via-[#020205]/40 to-transparent z-20" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent z-20" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#020205_80%)] z-20" />
     </div>
   );

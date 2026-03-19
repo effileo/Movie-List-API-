@@ -139,7 +139,7 @@ function MovieCard({ movie, onHover }) {
           <h3 className="text-white font-bold leading-tight line-clamp-2 mb-1 drop-shadow-md">{title}</h3>
           <div className="flex items-center justify-between">
             {rating && (
-              <span className="text-yellow-400 text-sm font-semibold flex items-center gap-1 drop-shadow-md">
+              <span className="text-cinematic-accent text-sm font-semibold flex items-center gap-1 drop-shadow-md">
                 <StarIcon className="w-3 h-3 fill-current" /> {rating}
               </span>
             )}

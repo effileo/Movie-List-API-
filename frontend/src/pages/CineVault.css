@@ -18,11 +18,8 @@
 .vault-title {
   font-size: 3rem;
   font-weight: 900;
-  letter-spacing: -0.03em;
-  background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  letter-spacing: 0.04em;
+  color: #ffffff;
   margin-bottom: 0.5rem;
 }
 
@@ -56,7 +53,7 @@
   margin-top: 1.5rem;
   padding: 0.75rem 2rem;
   border-radius: 999px;
-  background: var(--color-cinematic-accent, #3b82f6);
+  background: var(--color-cinematic-accent, #e11d48);
   color: #fff;
   font-weight: 700;
   text-decoration: none;
@@ -64,7 +61,7 @@
 }
 .vault-empty a:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 30px rgba(59,130,246,0.5);
+  box-shadow: 0 0 40px -15px rgba(0, 0, 0, 0.5);
 }
 
 /* ── Milestone Tracker ── */
@@ -141,11 +138,11 @@
 .milestone-progress-fill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #3b82f6, #a78bfa);
+  background: linear-gradient(90deg, #1e293b, #0f172a);
   transition: width 1s ease-out;
 }
 .milestone-badge.unlocked .milestone-progress-fill {
-  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  background: var(--color-cinematic-accent, #e11d48);
 }
 .milestone-progress-text {
   font-size: 0.7rem;
@@ -223,7 +220,7 @@
   border-color: rgba(59,130,246,0.15);
   box-shadow: inset 0 0 40px rgba(59,130,246,0.04);
 }
-.shelf-theme-sci-fi .shelf-genre-tag { color: #60a5fa; }
+.shelf-theme-sci-fi .shelf-genre-tag { color: #94a3b8; }
 .shelf-theme-sci-fi .shelf-surface::before {
   content: '';
   position: absolute;
@@ -324,7 +321,7 @@
   border: 2px solid rgba(0,0,0,0.4);
 }
 .case-status-dot.completed { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
-.case-status-dot.watching  { background: #3b82f6; box-shadow: 0 0 6px #3b82f6; }
+.case-status-dot.watching  { background: var(--color-cinematic-accent, #e11d48); box-shadow: 0 0 6px rgba(225,29,72,0.5); }
 .case-status-dot.planned   { background: #94a3b8; }
 .case-status-dot.dropped   { background: #ef4444; }
 
@@ -372,9 +369,7 @@
   width: 100%;
   border-radius: 0.75rem;
   overflow: hidden;
-  box-shadow:
-    0 25px 60px rgba(0,0,0,0.7),
-    0 0 80px rgba(59,130,246,0.08);
+  box-shadow: 0 0 40px -15px rgba(0, 0, 0, 0.5);
 }
 .case-inspected-visual img {
   width: 100%;
@@ -420,7 +415,7 @@
   margin-bottom: 1rem;
 }
 .case-details .case-rating {
-  color: #fbbf24;
+  color: var(--color-cinematic-accent, #e11d48);
   font-weight: 700;
   margin-bottom: 1rem;
 }
@@ -434,17 +429,17 @@
   font-size: 0.9rem;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  background: var(--color-cinematic-accent, #e11d48);
   color: #fff;
-  box-shadow: 0 0 20px rgba(59,130,246,0.3);
+  box-shadow: 0 0 40px -15px rgba(0, 0, 0, 0.5);
 }
 .case-action-btn:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 30px rgba(59,130,246,0.5);
+  box-shadow: 0 0 40px -15px rgba(0, 0, 0, 0.6);
 }
 .case-action-btn.completed {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  box-shadow: 0 0 20px rgba(34,197,94,0.3);
+  background: #16a34a;
+  box-shadow: 0 0 40px -15px rgba(0, 0, 0, 0.5);
 }
 .case-close-btn {
   position: absolute;

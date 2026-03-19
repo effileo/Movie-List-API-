@@ -51,17 +51,17 @@ export default function NotificationDropdown({ isOpen, onClose }) {
       initial={{ opacity: 0, y: 10, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 10, scale: 0.95 }}
-      className="absolute right-0 mt-2 w-80 bg-[#0f172a]/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl z-[1000] overflow-hidden"
+      className="absolute right-0 mt-2 w-80 backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl shadow-[0_0_40px_-15px_rgba(0,0,0,0.5)] z-[1000] overflow-hidden"
     >
       <div className="p-4 border-bottom border-white/5 flex justify-between items-center bg-white/5">
         <h3 className="text-sm font-bold text-white flex items-center gap-2">
-          <BellIcon size={16} className="text-blue-400" />
+          <BellIcon size={16} className="text-cinematic-accent" />
           Notifications
         </h3>
         {notifications.length > 0 && (
           <button 
             onClick={markAllRead}
-            className="text-[11px] font-bold text-blue-400 hover:text-blue-300 transition-colors uppercase tracking-wider"
+            className="text-[11px] font-bold text-cinematic-accent hover:text-white transition-colors uppercase tracking-wider"
           >
             Mark all read
           </button>
@@ -88,7 +88,7 @@ export default function NotificationDropdown({ isOpen, onClose }) {
                 className="p-4 border-bottom border-white/5 hover:bg-white/[0.02] transition-colors group"
               >
                 <div className="flex gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-[10px] font-bold text-white overflow-hidden">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-cinematic-accent flex items-center justify-center text-[10px] font-bold text-white overflow-hidden">
                     {n.fromUser?.avatarUrl ? (
                       <img src={n.fromUser.avatarUrl} alt="" className="w-full h-full object-cover" />
                     ) : (
@@ -107,7 +107,7 @@ export default function NotificationDropdown({ isOpen, onClose }) {
                       <div className="flex gap-2 mt-3">
                         <button 
                           onClick={() => handleAction(n.id, 'accept', n.fromUserId)}
-                          className="flex-1 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold transition-all flex items-center justify-center gap-1 shadow-lg shadow-blue-900/20"
+                          className="flex-1 py-1.5 rounded-lg bg-cinematic-accent hover:opacity-90 text-white text-[10px] font-bold transition-all flex items-center justify-center gap-1"
                         >
                           <CheckIcon size={12} /> Accept
                         </button>

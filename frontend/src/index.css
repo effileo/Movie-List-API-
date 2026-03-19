@@ -1,26 +1,43 @@
 @import "tailwindcss";
 
-/* Tailwind CSS v4 custom theme configuration */
+/* Premium Cinematic Noir – Tailwind v4 theme */
 @theme {
-  --color-cinematic-bg: #050510;
-  --color-cinematic-surface: rgba(255, 255, 255, 0.03);
-  --color-cinematic-border: rgba(255, 255, 255, 0.08);
-  --color-cinematic-text: #f8fafc;
-  --color-cinematic-muted: #94a3b8;
-  --color-cinematic-accent: #3b82f6;
+  /* Primary backgrounds */
+  --color-cinematic-bg: #050505;
+  --color-cinematic-bg-alt: #0a0a0c;
+  /* Surface (cards, modals) */
+  --color-cinematic-surface: #16161a;
+  /* Borders */
+  --color-cinematic-border: rgba(255, 255, 255, 0.05);
+  /* Text */
+  --color-cinematic-text: #ffffff;
+  --color-cinematic-muted: #94a3b8; /* slate-400 */
+  /* Single accent: primary buttons, star ratings, active states */
+  --color-cinematic-accent: #e11d48; /* Cine-Red */
+  /* Soft diffusion (no purple/blue glow) */
+  --shadow-cinematic-soft: 0 0 40px -15px rgba(0, 0, 0, 0.5);
+  /* Frosted glass */
+  --color-glass: rgba(255, 255, 255, 0.05);
+  --color-glass-border: rgba(255, 255, 255, 0.1);
 }
 
 @layer base {
   body {
     background-color: var(--color-cinematic-bg);
     color: var(--color-cinematic-text);
-    font-family: 'Geist', 'Inter', system-ui, sans-serif;
+    font-family: 'Inter', 'Geist', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
 }
 
-/* Custom Scrollbar for the elegant feel */
+/* Movie title / poster feel: tracked-out bold */
+.font-movie-title {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+/* Custom Scrollbar – neutral, no purple */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -36,11 +53,10 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Hide scrollbar for smooth horizontal movie rows but keep functionality */
 .hide-scroll::-webkit-scrollbar {
   display: none;
 }
 .hide-scroll {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

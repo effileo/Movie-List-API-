@@ -33,14 +33,14 @@ export default function GenreSurvey({ onSubmit }) {
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-4xl mx-auto py-12 px-6 flex flex-col items-center text-center bg-cinematic-surface rounded-3xl border border-cinematic-border/50 shadow-2xl relative overflow-hidden"
+      className="w-full max-w-4xl mx-auto py-12 px-6 flex flex-col items-center text-center bg-[#16161a] rounded-3xl border border-white/5 shadow-[0_0_40px_-15px_rgba(0,0,0,0.5)] relative overflow-hidden"
     >
       <div className="absolute -top-32 -left-32 w-64 h-64 bg-cinematic-accent/20 rounded-full blur-[100px]" />
-      <div className="absolute -bottom-32 -right-32 w-64 h-64 bg-purple-500/10 rounded-full blur-[100px]" />
+      <div className="absolute -bottom-32 -right-32 w-64 h-64 bg-black/30 rounded-full blur-[100px]" />
       
       <div className="relative z-10 w-full">
         <h2 className="text-3xl md:text-5xl font-black mb-4 text-white drop-shadow-lg">
-          Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-cinematic-accent to-purple-400">For You</span>
+          Welcome to <span className="text-cinematic-accent">For You</span>
         </h2>
         <p className="text-lg text-cinematic-muted max-w-xl mx-auto mb-8 font-light">
           Your watchlist is empty. Pick your top 3 favorite genres below to kickstart our AI recommendation engine.
@@ -61,7 +61,7 @@ export default function GenreSurvey({ onSubmit }) {
                 className={`
                   relative px-5 py-3 rounded-xl font-semibold tracking-wide transition-all duration-300
                   ${isSelected 
-                    ? 'bg-cinematic-accent border border-blue-400 text-white shadow-[0_0_20px_rgba(59,130,246,0.3)]' 
+                    ? 'bg-cinematic-accent border border-cinematic-accent text-white shadow-[0_0_40px_-15px_rgba(0,0,0,0.5)]' 
                     : 'bg-white/5 border border-white/10 text-white/70 hover:bg-white/10 hover:border-white/20'
                   }
                   ${isMaxedOut && 'opacity-50 cursor-not-allowed'}
@@ -90,7 +90,7 @@ export default function GenreSurvey({ onSubmit }) {
           className={`
             px-10 py-4 rounded-full font-black text-lg tracking-widest uppercase transition-all duration-500
             ${selected.length === 3 
-              ? 'bg-gradient-to-r from-cinematic-accent to-purple-600 text-white shadow-[0_0_40px_rgba(59,130,246,0.5)] shadow-purple-500/30' 
+              ? 'bg-cinematic-accent text-white shadow-[0_0_40px_-15px_rgba(0,0,0,0.5)]' 
               : 'bg-white/10 text-white/30 cursor-not-allowed'}
           `}
         >

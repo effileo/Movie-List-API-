@@ -20,7 +20,7 @@ function getActionText(item) {
             {item.movie?.title}
           </Link>
           {' '}
-          <span className="text-yellow-400 font-bold">★ {item.rating}/10</span>
+          <span className="text-cinematic-accent font-bold">★ {item.rating}/10</span>
         </span>
       );
     case 'comment':
@@ -49,8 +49,8 @@ function getActionText(item) {
 
 function getActionIcon(type) {
   switch (type) {
-    case 'review': return <StarIcon className="w-3.5 h-3.5 text-yellow-400" />;
-    case 'comment': return <PenLineIcon className="w-3.5 h-3.5 text-blue-400" />;
+    case 'review': return <StarIcon className="w-3.5 h-3.5 text-cinematic-accent" />;
+    case 'comment': return <PenLineIcon className="w-3.5 h-3.5 text-cinematic-accent" />;
     case 'watchlist': return <BookmarkPlusIcon className="w-3.5 h-3.5 text-green-400" />;
     default: return null;
   }
@@ -83,7 +83,7 @@ export default function FeedCard({ item }) {
         {/* Avatar */}
         <UserPreview userId={item.user?.id}>
           <Link to={`/users/${item.user?.id}`}>
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cinematic-accent to-purple-600 flex items-center justify-center text-xs font-bold text-white shrink-0 cursor-pointer border border-slate-700/50">
+            <div className="w-9 h-9 rounded-full bg-cinematic-accent flex items-center justify-center text-xs font-bold text-white shrink-0 cursor-pointer border border-white/10">
               {item.user?.name?.[0]?.toUpperCase() || '?'}
             </div>
           </Link>

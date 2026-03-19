@@ -51,7 +51,7 @@ export default function ForYouSection() {
         <div className="w-full flex flex-col items-center justify-center text-center py-16 bg-white/5 border border-white/10 rounded-3xl">
           <h3 className="text-xl font-bold text-white mb-2">Want personalized recommendations?</h3>
           <p className="text-cinematic-muted mb-8">Sign in to kickstart our AI recommendation engine.</p>
-          <Link to="/login" className="px-8 py-4 rounded-full bg-cinematic-accent hover:bg-blue-600 text-white font-bold tracking-wide transition-colors">
+          <Link to="/login" className="px-8 py-4 rounded-full bg-cinematic-accent hover:opacity-90 text-white font-bold tracking-wide transition-colors shadow-[0_0_40px_-15px_rgba(0,0,0,0.5)]">
             Sign In to HealthNet
           </Link>
         </div>

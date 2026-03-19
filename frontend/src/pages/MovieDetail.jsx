@@ -168,21 +168,21 @@ export default function MovieDetail() {
         <img
           src={posterSrc}
           alt={movie.title}
-          className="w-60 h-auto rounded-2xl shadow-2xl border border-slate-800 object-cover shrink-0"
+          className="w-60 h-auto rounded-2xl shadow-2xl border border-white/5 object-cover shrink-0"
           onError={(e) => { e.target.onerror = null; e.target.src = POSTER_PLACEHOLDER; }}
         />
         <div className="flex flex-col gap-4 flex-1">
           <h1 className="text-4xl md:text-5xl font-black tracking-tight text-white">{movie.title}</h1>
           <div className="flex flex-wrap items-center gap-3 text-sm text-cinematic-muted">
-            {movie.year && <span className="px-3 py-1 rounded-full border border-slate-800 bg-white/[0.03]">{movie.year}</span>}
+            {movie.year && <span className="px-3 py-1 rounded-full border border-white/5 bg-white/5">{movie.year}</span>}
             {movie.runTime && <span>{movie.runTime} min</span>}
             {movie.genre?.length > 0 && movie.genre.map((g) => (
-              <span key={g} className="px-3 py-1 rounded-full border border-slate-800 bg-white/[0.03]">{g}</span>
+              <span key={g} className="px-3 py-1 rounded-full border border-white/5 bg-white/5">{g}</span>
             ))}
           </div>
           {aggregate && (
             <div className="flex items-center gap-2 text-lg">
-              <span className="text-yellow-400 font-bold">★ {aggregate.averageRating?.toFixed(1) ?? '—'}</span>
+              <span className="text-cinematic-accent font-bold">★ {aggregate.averageRating?.toFixed(1) ?? '—'}</span>
               <span className="text-cinematic-muted text-sm">({aggregate.count} review{aggregate.count !== 1 ? 's' : ''})</span>
             </div>
           )}
@@ -191,7 +191,7 @@ export default function MovieDetail() {
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              className="self-start flex items-center gap-2 px-5 py-2.5 rounded-full bg-cinematic-accent text-white font-semibold shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:bg-blue-600 transition-colors disabled:opacity-50"
+              className="self-start flex items-center gap-2 px-5 py-2.5 rounded-full bg-cinematic-accent text-white font-semibold shadow-[0_0_40px_-15px_rgba(0,0,0,0.5)] hover:opacity-90 transition-colors disabled:opacity-50"
               onClick={handleAddToWatchlist}
               disabled={adding}
             >
@@ -210,7 +210,7 @@ export default function MovieDetail() {
 
         {/* Review Form */}
         {user && (
-          <div className="p-6 rounded-2xl border border-slate-800 bg-white/[0.02]">
+          <div className="p-6 rounded-2xl border border-white/5 bg-[#16161a]">
             <h3 className="text-lg font-bold mb-4 text-white">Your Review</h3>
             <form onSubmit={handleSubmitReview} className="flex flex-col gap-4">
               <StarSlider value={reviewForm.rating} onChange={(val) => setReviewForm((f) => ({ ...f, rating: val }))} />
@@ -219,14 +219,14 @@ export default function MovieDetail() {
                 value={reviewForm.text}
                 onChange={(e) => setReviewForm((f) => ({ ...f, text: e.target.value }))}
                 rows={3}
-                className="w-full bg-transparent border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder:text-cinematic-muted/50 focus:outline-none focus:border-cinematic-accent/50 transition-colors resize-none"
+                className="w-full bg-transparent border border-white/5 rounded-xl px-4 py-3 text-sm text-white placeholder:text-cinematic-muted/50 focus:outline-none focus:border-white/20 transition-colors resize-none"
               />
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={submittingReview}
-                className="self-start px-5 py-2.5 rounded-full bg-cinematic-accent text-white font-semibold hover:bg-blue-600 transition-colors disabled:opacity-50"
+                className="self-start px-5 py-2.5 rounded-full bg-cinematic-accent text-white font-semibold hover:opacity-90 transition-colors disabled:opacity-50"
               >
                 {submittingReview ? 'Saving…' : myReview ? 'Update Review' : 'Submit Review'}
               </motion.button>
@@ -246,19 +246,19 @@ export default function MovieDetail() {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, height: 0 }}
-                className="p-4 rounded-xl border border-slate-800 bg-white/[0.02] flex gap-3"
+                className="p-4 rounded-xl border border-white/5 bg-[#16161a] flex gap-3"
               >
                 <UserPreview userId={r.user?.id}>
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cinematic-accent to-purple-600 flex items-center justify-center text-xs font-bold text-white shrink-0 cursor-pointer">
+                  <div className="w-8 h-8 rounded-full bg-cinematic-accent flex items-center justify-center text-xs font-bold text-white shrink-0 cursor-pointer">
                     {r.user?.name?.[0]?.toUpperCase() || '?'}
                   </div>
                 </UserPreview>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-semibold text-white text-sm">{r.user?.name}</span>
-                    <span className="text-yellow-400 text-sm font-bold">★ {r.rating}</span>
+                    <span className="text-cinematic-accent text-sm font-bold">★ {r.rating}</span>
                     {user?.id === r.user?.id && (
-                      <button type="button" onClick={() => handleDeleteReview(r.id)} className="ml-auto text-cinematic-muted hover:text-red-400 transition-colors">
+                      <button type="button" onClick={() => handleDeleteReview(r.id)} className="ml-auto text-slate-400 hover:text-cinematic-accent transition-colors">
                         <TrashIcon className="w-3.5 h-3.5" />
                       </button>
                     )}
@@ -282,7 +282,7 @@ export default function MovieDetail() {
               placeholder="Add a comment…"
               value={commentForm}
               onChange={(e) => setCommentForm(e.target.value)}
-              className="flex-1 bg-transparent border border-slate-800 rounded-full px-5 py-2.5 text-sm text-white placeholder:text-cinematic-muted/50 focus:outline-none focus:border-cinematic-accent/50 transition-colors"
+              className="flex-1 bg-transparent border border-white/10 rounded-full px-5 py-2.5 text-sm text-white placeholder:text-cinematic-muted/50 focus:outline-none focus:border-white/20 transition-colors"
               required
             />
             <motion.button
@@ -290,7 +290,7 @@ export default function MovieDetail() {
               whileTap={{ scale: 0.95 }}
               type="submit"
               disabled={submittingComment || !commentForm.trim()}
-              className="p-2.5 rounded-full bg-cinematic-accent text-white hover:bg-blue-600 transition-colors disabled:opacity-50"
+              className="p-2.5 rounded-full bg-cinematic-accent text-white hover:opacity-90 transition-colors disabled:opacity-50"
             >
               <SendIcon className="w-4 h-4" />
             </motion.button>
@@ -304,7 +304,7 @@ export default function MovieDetail() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, height: 0 }}
-                className="p-3 rounded-xl border border-slate-800/50 bg-white/[0.01] flex gap-3"
+                className="p-3 rounded-xl border border-white/5 bg-white/5 flex gap-3"
               >
                 <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
                   {c.user?.name?.[0]?.toUpperCase() || '?'}

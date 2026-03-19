@@ -73,7 +73,7 @@ function MovieQuickViewModal({ movie, onClose }) {
             <div className="flex flex-wrap items-center gap-4 mt-auto">
               <button 
                 onClick={() => navigate(`/movie/tmdb/${movie.id}`)}
-                className="px-8 py-4 rounded-full bg-cinematic-accent hover:bg-blue-600 text-white font-bold tracking-widest uppercase transition-colors shadow-lg shadow-blue-500/30 flex items-center gap-2"
+                className="px-8 py-4 rounded-full bg-cinematic-accent hover:opacity-90 text-white font-bold tracking-widest uppercase transition-colors shadow-[0_0_40px_-15px_rgba(0,0,0,0.5)] flex items-center gap-2"
               >
                 <PlayIcon className="w-4 h-4 fill-current" /> Go to Details
               </button>
@@ -120,7 +120,7 @@ export default function BentoGrid({ recommendations }) {
               <div className="absolute bottom-0 left-0 p-6 w-full transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                 <div className="flex items-center gap-2 mb-2">
                    {rec.vote_average > 0 && (
-                      <span className="flex items-center gap-1 text-xs font-bold text-yellow-400 bg-black/50 px-2 py-1 rounded-md backdrop-blur-md">
+                      <span className="flex items-center gap-1 text-xs font-bold text-cinematic-accent bg-black/50 px-2 py-1 rounded-md backdrop-blur-md">
                         <StarIcon className="w-3 h-3 fill-current" /> {rec.vote_average.toFixed(1)}
                       </span>
                    )}

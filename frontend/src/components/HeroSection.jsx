@@ -130,7 +130,7 @@ export default function HeroSection({ setHeroBackdrop }) {
               Trending #{currentIndex + 1}
             </span>
             {rating && (
-              <div className="flex items-center gap-1 text-yellow-400 font-bold drop-shadow-md">
+              <div className="flex items-center gap-1 text-cinematic-accent font-bold drop-shadow-md">
                 <StarIcon className="w-4 h-4 fill-current" /> {rating}
               </div>
             )}

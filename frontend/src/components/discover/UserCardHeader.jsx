@@ -56,8 +56,8 @@ export default function UserCardHeader({ user }) {
           )}
         </Link>
         <div className="user-details">
-          <Link to={`/users/${user.id}`} className="user-name hover:text-blue-400">
-            {user.name} {isSelf && <span className="text-[10px] text-blue-400 font-bold bg-blue-400/10 px-1.5 py-0.5 rounded ml-1">YOU</span>}
+          <Link to={`/users/${user.id}`} className="user-name hover:text-cinematic-accent">
+            {user.name} {isSelf && <span className="text-[10px] text-cinematic-accent font-bold bg-cinematic-accent/10 px-1.5 py-0.5 rounded ml-1">YOU</span>}
           </Link>
           <span className="user-status">Shared a watchlist</span>
         </div>

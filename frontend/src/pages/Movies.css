@@ -14,19 +14,19 @@
   display: flex;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 14px;
   padding: 0.55rem;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
 }
 
 .search-form input {
   flex: 1;
   padding: 0.7rem 0.86rem;
-  border: 1px solid transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 9px;
-  background: rgba(8, 14, 33, 0.9);
+  background: rgba(22, 22, 26, 0.8);
   color: #eee;
   font-size: 1rem;
 }
@@ -35,7 +35,7 @@
   padding: 0.7rem 1rem;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, #6f7cff, #18c8ff);
+  background: var(--color-cinematic-accent, #e11d48);
   color: #fff;
   cursor: pointer;
   font-weight: 600;
@@ -108,7 +108,7 @@
 
 .movie-rating {
   font-size: 0.85rem;
-  color: #ffd54f;
+  color: var(--color-cinematic-accent, #e11d48);
   font-weight: 600;
 }
 
@@ -284,17 +284,18 @@
 .movie-rating-agg {
   margin: 0.25rem 0;
   font-weight: 600;
+  color: var(--color-cinematic-accent, #e11d48);
 }
 
 .movie-reviews,
 .movie-comments {
   margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
   background: rgba(255, 255, 255, 0.05);
   border-radius: 14px;
   padding: 1.25rem;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
 }
 
 .movie-reviews h2,

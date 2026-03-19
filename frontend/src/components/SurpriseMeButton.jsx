@@ -38,7 +38,7 @@ export default function SurpriseMeButton({ onSurpriseResult }) {
       <motion.div
         animate={isRolling ? { x: ["-100%", "200%"] } : { x: "-100%" }}
         transition={isRolling ? { repeat: Infinity, duration: 1, ease: "linear" } : {}}
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/20 to-transparent z-0"
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent z-0"
       />
       
       <div className="relative z-10 flex items-center gap-2 text-[#e2e8f0]">
@@ -46,7 +46,7 @@ export default function SurpriseMeButton({ onSurpriseResult }) {
           animate={isRolling ? { rotate: 360 } : { rotate: 0 }}
           transition={isRolling ? { repeat: Infinity, duration: 0.4, ease: "linear" } : { duration: 0.3 }}
         >
-          {isRolling ? <SparklesIcon className="w-5 h-5 text-purple-400" /> : <DicesIcon className="w-5 h-5 text-purple-400" />}
+          {isRolling ? <SparklesIcon className="w-5 h-5 text-cinematic-accent" /> : <DicesIcon className="w-5 h-5 text-slate-400" />}
         </motion.div>
         {isRolling ? "Rolling..." : "Surprise Me"}
       </div>
