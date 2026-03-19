@@ -1,25 +1,32 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { HeartIcon, MessageCircleIcon, CopyIcon, ExternalLinkIcon } from 'lucide-react';
-import FanStack from './FanStack';
+import { HeartIcon, MessageCircleIcon, CopyIcon, ExternalLinkIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
+import PosterStrip from './PosterStrip';
 import UserCardHeader from './UserCardHeader';
 import { apiRoutes } from '../../api/client';
 
-export default function WatchlistCard({ watchlist }) {
-  const [isHovered, setIsHovered] = useState(false);
+const CARD_MIN_HEIGHT = 320;
+
+export default function WatchlistCard({ watchlist, loading = false }) {
   const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(watchlist.likeCount || 0);
+  const [likeCount, setLikeCount] = useState(watchlist?.likeCount ?? 0);
   const [cloning, setCloning] = useState(false);
   const [cloned, setCloned] = useState(false);
+  const [captionExpanded, setCaptionExpanded] = useState(false);
+
+  const caption = watchlist?.description?.trim() || `Shared a watchlist · ${watchlist?.movieCount ?? 0} ${watchlist?.movieCount === 1 ? 'movie' : 'movies'}`;
+  const captionLong = caption.length > 80;
+  const showReadMore = captionLong && !captionExpanded;
 
   const handleLike = async (e) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!watchlist?.id) return;
     try {
       await apiRoutes.users.toggleWatchlistLike(watchlist.id);
       setLiked(!liked);
-      setLikeCount(prev => liked ? prev - 1 : prev + 1);
+      setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
     } catch (err) {
       console.error('Like failed', err);
     }
@@ -28,7 +35,7 @@ export default function WatchlistCard({ watchlist }) {
   const handleClone = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (cloning || cloned) return;
+    if (cloning || cloned || !watchlist?.id) return;
     setCloning(true);
     try {
       await apiRoutes.watchlist.clone(watchlist.id);
@@ -41,72 +48,107 @@ export default function WatchlistCard({ watchlist }) {
   };
 
   return (
-    <motion.div 
-      className="watchlist-card"
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      whileHover={{ y: -5 }}
+    <motion.div
+      className="discover-watchlist-card"
       layout
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25 }}
     >
-      <UserCardHeader user={watchlist} />
-      
-      <Link to={`/users/${watchlist.id}/watchlist`} className="card-content-link">
-        <div className="card-body">
-          <FanStack movies={watchlist.previewMovies} />
-          
-          <div className="card-stats-overlay">
-            <div className="movie-count">
-              {watchlist.movieCount} {watchlist.movieCount === 1 ? 'Movie' : 'Movies'}
-            </div>
-          </div>
-        </div>
+      <header className="discover-card-header">
+        <UserCardHeader user={watchlist} />
+      </header>
 
-        <AnimatePresence>
-          {isHovered && (
-            <motion.div 
-              className="card-hover-reveal"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-            >
-              <div className="hover-titles">
-                {watchlist.previewMovies?.map((m, i) => (
-                  <span key={i} className="hover-title-chip">{m.title}</span>
-                ))}
-              </div>
-              <button className="view-collection-btn">
-                View Full Collection <ExternalLinkIcon size={14} />
+      <Link to={`/users/${watchlist?.id}/watchlist`} className="discover-card-body-link">
+        <div className="discover-card-body" style={{ minHeight: CARD_MIN_HEIGHT - 140 }}>
+          <PosterStrip
+            movies={watchlist?.previewMovies}
+            movieCount={watchlist?.movieCount ?? 0}
+            loading={loading}
+          />
+
+          <div className="discover-card-caption-wrap">
+            <AnimatePresence initial={false}>
+              {showReadMore ? (
+                <motion.p
+                  key="clamped"
+                  className="discover-card-caption discover-card-caption-clamp"
+                  initial={false}
+                  exit={{ opacity: 0 }}
+                >
+                  {caption.slice(0, 80)}…
+                </motion.p>
+              ) : (
+                <motion.p
+                  key="full"
+                  className="discover-card-caption"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  {caption}
+                </motion.p>
+              )}
+            </AnimatePresence>
+            {captionLong && (
+              <button
+                type="button"
+                className="discover-card-read-more"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setCaptionExpanded(!captionExpanded);
+                }}
+              >
+                {captionExpanded ? (
+                  <>Show less <ChevronUpIcon size={12} /></>
+                ) : (
+                  <>Read more <ChevronDownIcon size={12} /></>
+                )}
               </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            )}
+          </div>
+
+          <span className="discover-card-view-collection">
+            View collection <ExternalLinkIcon size={12} />
+          </span>
+        </div>
       </Link>
 
-      <div className="card-actions glass-morphism">
-        <div className="left-actions">
-          <button 
-            className={`action-btn like-btn ${liked ? 'active' : ''}`} 
+      <footer className="discover-card-engagement">
+        <div className="discover-engagement-left">
+          <button
+            type="button"
+            className={`discover-action-btn like-btn ${liked ? 'active' : ''}`}
             onClick={handleLike}
+            aria-label="Like"
           >
             <HeartIcon size={18} fill={liked ? 'currentColor' : 'none'} />
             <span>{likeCount}</span>
           </button>
-          <div className="action-btn comment-btn">
+          <span className="discover-action-btn comment-btn" aria-hidden>
             <MessageCircleIcon size={18} />
-            <span>{watchlist.commentCount}</span>
-          </div>
+            <span>{watchlist?.commentCount ?? 0}</span>
+          </span>
+          <button
+            type="button"
+            className={`discover-action-btn clone-btn ${cloned ? 'success' : ''}`}
+            onClick={handleClone}
+            disabled={cloning || cloned}
+            aria-label={cloned ? 'Saved' : 'Clone watchlist'}
+          >
+            {cloned ? (
+              'Saved!'
+            ) : (
+              <>
+                <CopyIcon size={18} />
+                {cloning ? 'Saving…' : 'Clone'}
+              </>
+            )}
+          </button>
         </div>
-        
-        <button 
-          className={`action-btn clone-btn ${cloned ? 'success' : ''}`} 
-          onClick={handleClone}
-          disabled={cloning || cloned}
-          title="Quick Clone to your watchlist"
-        >
-          {cloned ? 'Saved!' : <CopyIcon size={18} />}
-          {cloning ? 'Saving...' : ''}
-        </button>
-      </div>
+      </footer>
     </motion.div>
   );
 }

@@ -15,6 +15,18 @@ export default function UserCardHeader({ user }) {
 
   const isSelf = currentUser?.id === user.id;
 
+  function timeAgo(date) {
+    if (!date) return '';
+    const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+    if (seconds < 60) return 'just now';
+    const mins = Math.floor(seconds / 60);
+    if (mins < 60) return `${mins}m ago`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
+  }
+
   const handleFollow = async (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -50,7 +62,7 @@ export default function UserCardHeader({ user }) {
           {user.avatarUrl ? (
             <img src={user.avatarUrl} alt={user.name} className="user-avatar" />
           ) : (
-            <div className="initial-avatar" style={{ background: `linear-gradient(135deg, #6366f1 0%, #a855f7 100%)` }}>
+            <div className="initial-avatar" style={{ background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)' }}>
               {initials}
             </div>
           )}
@@ -59,7 +71,7 @@ export default function UserCardHeader({ user }) {
           <Link to={`/users/${user.id}`} className="user-name hover:text-cinematic-accent">
             {user.name} {isSelf && <span className="text-[10px] text-cinematic-accent font-bold bg-cinematic-accent/10 px-1.5 py-0.5 rounded ml-1">YOU</span>}
           </Link>
-          <span className="user-status">Shared a watchlist</span>
+          <span className="user-status user-time-ago">{timeAgo(user.updatedAt) || 'Shared a watchlist'}</span>
         </div>
       </div>
 

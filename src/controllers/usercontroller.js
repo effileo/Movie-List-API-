@@ -41,6 +41,7 @@ export function getWatchlistFeed(prisma) {
                 name: true,
                 avatarUrl: true,
                 watchlistPublic: true,
+                updatedAt: true,
                 followers: {
                   where: { followerId: req.user?.id || 0 },
                   select: { status: true }
@@ -53,12 +54,12 @@ export function getWatchlistFeed(prisma) {
                     },
                 },
                 watchListItems: {
-                    take: 3,
+                    take: 4,
                     orderBy: { createdAt: 'desc' },
                     include: { movie: { select: { posterPath: true, title: true, genre: true } } },
                 },
             },
-            orderBy: { createdAt: 'desc' },
+            orderBy: { updatedAt: 'desc' },
             take: limit,
         });
         const data = users.map((u) => ({
@@ -69,6 +70,7 @@ export function getWatchlistFeed(prisma) {
             movieCount: u._count.watchListItems,
             likeCount: u._count.watchlistLikesRecv,
             commentCount: u._count.watchlistCommentsRecv,
+            updatedAt: u.updatedAt?.toISOString?.() ?? null,
             previewMovies: u.watchListItems.map((item) => ({
                 posterPath: item.movie.posterPath,
                 title: item.movie.title,
