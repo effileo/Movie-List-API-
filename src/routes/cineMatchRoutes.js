@@ -3,6 +3,7 @@ import authMiddleware from '../middleware/authMiddleware.js';
 import {
     getCineMatchFriends,
     getCineMatchStack,
+    getCineMatchActiveSession,
     postCineMatchSwipe,
     postCineMatchInvite,
     getCineMatchInvitesPending,
@@ -16,6 +17,7 @@ function cineMatchRoutes(prisma) {
 
     router.get('/friends', getCineMatchFriends(prisma));
     router.get('/stack', getCineMatchStack(prisma));
+    router.get('/session/active', getCineMatchActiveSession(prisma));
     router.post('/swipe', postCineMatchSwipe(prisma));
 
     router.post('/invite', postCineMatchInvite(prisma));

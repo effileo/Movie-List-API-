@@ -26,7 +26,9 @@ export default function FriendSelector({
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  const selectedFriend = friends.find((f) => f.id === selectedFriendId);
+  const selectedFriend = friends.find(
+    (f) => Number(f.id) === Number(selectedFriendId)
+  );
   const filteredFriends = search.trim()
     ? friends.filter((f) => f.name.toLowerCase().includes(search.trim().toLowerCase()))
     : friends;
@@ -50,7 +52,7 @@ export default function FriendSelector({
             <button
               key={friend.id}
               type="button"
-              className={`cine-match-selector-avatar ${selectedFriendId === friend.id && !soloMode ? 'active' : ''}`}
+              className={`cine-match-selector-avatar ${Number(selectedFriendId) === Number(friend.id) && !soloMode ? 'active' : ''}`}
               onClick={() => {
                 onSoloModeChange(false);
                 onSelectFriend(friend.id);
@@ -143,8 +145,14 @@ export default function FriendSelector({
         </div>
       )}
 
-      {/* Send Invite when friend selected and status is 'none' */}
-      {selectedFriendId && !soloMode && partnerStatus === 'none' && selectedFriend && (
+      {/* Send Invite when friend selected and we haven't already sent / matched */}
+      {selectedFriendId &&
+        !soloMode &&
+        selectedFriend &&
+        partnerStatus !== 'pending_sent' &&
+        partnerStatus !== 'accepted' &&
+        partnerStatus !== 'pending_received' &&
+        (partnerStatus === 'none' || partnerStatus === null) && (
         <div className="cine-match-send-invite-wrap">
           <button
             type="button"

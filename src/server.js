@@ -1,3 +1,4 @@
+import { createServer } from 'http';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -15,6 +16,7 @@ import reviewRoutes from './routes/reviewRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
 import cineMatchRoutes from './routes/cineMatchRoutes.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
+import { attachSocketServer } from './realtime/socketServer.js';
 
 config();
 validateEnv();
@@ -53,9 +55,13 @@ app.get('/health', async (req, res) => {
 app.use(notFoundHandler);
 app.use(errorHandler);
 
+const httpServer = createServer(app);
+
+attachSocketServer(httpServer);
+
 const start = async () => {
     await connectDB();
-    app.listen(port, () => {
+    httpServer.listen(port, () => {
         console.log('server is running on port ' + port);
     });
 };

@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckIcon, XIcon, BellIcon, UserIcon, HeartIcon, MessageCircleIcon } from 'lucide-react';
+import { CheckIcon, XIcon, BellIcon, UserIcon, Clapperboard } from 'lucide-react';
 import { apiRoutes } from '../../api/client';
 import { useToast } from '../ui/ToastProvider';
+import { useNotificationCount } from '../../context/NotificationCountContext';
 
 export default function NotificationDropdown({ isOpen, onClose }) {
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
+  const { refreshUnreadCount } = useNotificationCount();
 
   const fetchNotifications = async () => {
     try {
@@ -29,6 +32,7 @@ export default function NotificationDropdown({ isOpen, onClose }) {
       await apiRoutes.users.followAction(requesterId, action);
       showToast(action === 'accept' ? 'Follow request accepted!' : 'Follow request declined.');
       setNotifications(prev => prev.filter(n => n.id !== id));
+      await refreshUnreadCount();
     } catch (err) {
       showToast('Failed to process request.', 'error');
     }
@@ -38,9 +42,24 @@ export default function NotificationDropdown({ isOpen, onClose }) {
     try {
       await apiRoutes.users.markNotificationsRead();
       setNotifications([]);
+      await refreshUnreadCount();
       showToast('All notifications cleared.');
     } catch (err) {
       console.error('Failed to mark read', err);
+    }
+  };
+
+  const handleCineMatchJoin = async (n) => {
+    if (!n.fromUserId) return;
+    try {
+      await apiRoutes.cineMatch.acceptInvite(n.fromUserId);
+      await refreshUnreadCount();
+      setNotifications((prev) => prev.filter((x) => x.id !== n.id));
+      showToast("You're in — Cine-Match!");
+      onClose?.();
+      navigate('/dashboard');
+    } catch (err) {
+      showToast(err.message || 'Could not join session.', 'error');
     }
   };
 
@@ -97,7 +116,14 @@ export default function NotificationDropdown({ isOpen, onClose }) {
                   </div>
                   <div className="flex-grow">
                     <p className="text-xs text-slate-200 leading-relaxed">
-                      <span className="font-bold text-white">{n.fromUser?.name || 'Someone'}</span> {n.message.replace(n.fromUser?.name || '', '').trim()}
+                      {n.type === 'CINE_MATCH_INVITE' ? (
+                        <span>{n.message}</span>
+                      ) : (
+                        <>
+                          <span className="font-bold text-white">{n.fromUser?.name || 'Someone'}</span>{' '}
+                          {n.message.replace(n.fromUser?.name || '', '').trim()}
+                        </>
+                      )}
                     </p>
                     <span className="text-[10px] text-slate-500 mt-1 block">
                       {new Date(n.createdAt).toLocaleDateString()}
@@ -116,6 +142,17 @@ export default function NotificationDropdown({ isOpen, onClose }) {
                           className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 text-[10px] font-bold transition-all flex items-center justify-center gap-1"
                         >
                           <XIcon size={12} /> Decline
+                        </button>
+                      </div>
+                    )}
+                    {n.type === 'CINE_MATCH_INVITE' && (
+                      <div className="flex gap-2 mt-3">
+                        <button
+                          type="button"
+                          onClick={() => handleCineMatchJoin(n)}
+                          className="flex-1 py-1.5 rounded-lg bg-cinematic-accent hover:opacity-90 text-white text-[10px] font-bold transition-all flex items-center justify-center gap-1 shadow-[0_0_20px_-8px_rgba(225,29,72,0.8)]"
+                        >
+                          <Clapperboard size={12} /> Join
                         </button>
                       </div>
                     )}

@@ -1,4 +1,5 @@
 import { fetchTrendingMovies, fetchMovieById } from '../services/tmdb.js';
+import { emitToUser } from '../realtime/emit.js';
 
 const TMDB_BASE = 'https://api.themoviedb.org/3';
 
@@ -14,9 +15,6 @@ async function discoverStack(genreIds, excludedTmdbIds = [], limit = 20) {
     return results.slice(0, limit);
 }
 
-/**
- * GET /cine-match/friends – list users the current user follows (ACCEPTED) for the "Match with Friend" dropdown.
- */
 export function getCineMatchFriends(prisma) {
     return async (req, res) => {
         try {
@@ -43,10 +41,6 @@ export function getCineMatchFriends(prisma) {
     };
 }
 
-/**
- * GET /cine-match/stack – pre-load stack of movies for swiping (TMDB recommendations based on watchlist, or trending).
- * Returns { results: TMDB movie objects[] } so the client can show the next 5+ with zero delay.
- */
 export function getCineMatchStack(prisma) {
     return async (req, res) => {
         try {
@@ -100,20 +94,130 @@ export function getCineMatchStack(prisma) {
 }
 
 /**
- * POST /cine-match/swipe – record like/dislike and check for match with selected friend.
- * Body: { tmdbId: number, direction: 'like' | 'dislike', friendId?: number }
- * If direction is 'like': upsert cineMatchLike. If friendId provided and friend has liked same tmdbId, return isMatch + friend + movie details.
+ * GET /cine-match/session/active – current user's active Cine-Match session (if any).
+ */
+export function getCineMatchActiveSession(prisma) {
+    return async (req, res) => {
+        try {
+            const userId = req.user.id;
+            const now = new Date();
+            const session = await prisma.cineMatchSession.findFirst({
+                where: {
+                    status: 'ACTIVE',
+                    expiresAt: { gt: now },
+                    OR: [{ user1Id: userId }, { user2Id: userId }],
+                },
+                orderBy: { createdAt: 'desc' },
+            });
+            if (!session) {
+                return res.json({ session: null });
+            }
+            const partnerId = session.user1Id === userId ? session.user2Id : session.user1Id;
+            const partner = await prisma.user.findUnique({
+                where: { id: partnerId },
+                select: { id: true, name: true, avatarUrl: true },
+            });
+            res.json({
+                session: {
+                    id: session.id,
+                    partnerId,
+                    partner,
+                    expiresAt: session.expiresAt,
+                },
+            });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Failed to load session' });
+        }
+    };
+}
+
+/**
+ * POST /cine-match/swipe – like/dislike; optional sessionId for session-scoped matching + real-time partner sync.
  */
 export function postCineMatchSwipe(prisma) {
     return async (req, res) => {
         try {
             const userId = req.user.id;
-            const { tmdbId, direction, friendId } = req.body;
+            const { tmdbId, direction, friendId, sessionId: bodySessionId } = req.body;
             if (tmdbId == null || !['like', 'dislike'].includes(direction)) {
                 return res.status(400).json({ error: 'tmdbId and direction (like|dislike) required' });
             }
             const tid = parseInt(tmdbId, 10);
             if (Number.isNaN(tid)) return res.status(400).json({ error: 'Invalid tmdbId' });
+
+            if (bodySessionId) {
+                const sess = await prisma.cineMatchSession.findUnique({
+                    where: { id: bodySessionId },
+                });
+                if (!sess || sess.status !== 'ACTIVE' || sess.expiresAt < new Date()) {
+                    return res.status(400).json({ error: 'Invalid or expired session' });
+                }
+                if (userId !== sess.user1Id && userId !== sess.user2Id) {
+                    return res.status(403).json({ error: 'Not in this session' });
+                }
+                const partnerId = sess.user1Id === userId ? sess.user2Id : sess.user1Id;
+
+                if (direction === 'like') {
+                    await prisma.cineMatchSessionSwipe.upsert({
+                        where: {
+                            sessionId_userId_tmdbId: {
+                                sessionId: bodySessionId,
+                                userId,
+                                tmdbId: tid,
+                            },
+                        },
+                        create: { sessionId: bodySessionId, userId, tmdbId: tid },
+                        update: {},
+                    });
+                } else {
+                    await prisma.cineMatchSessionSwipe.deleteMany({
+                        where: { sessionId: bodySessionId, userId, tmdbId: tid },
+                    });
+                }
+
+                let isMatch = false;
+                let friend = null;
+                let movie = null;
+
+                if (direction === 'like') {
+                    const partnerSwipe = await prisma.cineMatchSessionSwipe.findUnique({
+                        where: {
+                            sessionId_userId_tmdbId: {
+                                sessionId: bodySessionId,
+                                userId: partnerId,
+                                tmdbId: tid,
+                            },
+                        },
+                    });
+                    if (partnerSwipe) {
+                        isMatch = true;
+                        friend = await prisma.user.findUnique({
+                            where: { id: partnerId },
+                            select: { id: true, name: true, avatarUrl: true },
+                        });
+                        try {
+                            movie = await fetchMovieById(tid);
+                        } catch (_) {
+                            movie = { id: tid, title: 'Movie', poster_path: null, overview: '', vote_average: 0 };
+                        }
+                    }
+                }
+
+                emitToUser(partnerId, 'cine_match:partner_swiped', {
+                    sessionId: bodySessionId,
+                    tmdbId: tid,
+                    direction,
+                    fromUserId: userId,
+                });
+
+                return res.json({
+                    isMatch,
+                    friend: friend || undefined,
+                    movie: movie || undefined,
+                    sessionId: bodySessionId,
+                });
+            }
 
             if (direction === 'like') {
                 await prisma.cineMatchLike.upsert({
@@ -141,17 +245,21 @@ export function postCineMatchSwipe(prisma) {
                     });
                     if (friendLike) {
                         isMatch = true;
-                        const followed = await prisma.user.findUnique({
+                        friend = await prisma.user.findUnique({
                             where: { id: fid },
                             select: { id: true, name: true, avatarUrl: true },
                         });
-                        friend = followed;
                         try {
                             movie = await fetchMovieById(tid);
                         } catch (_) {
                             movie = { id: tid, title: 'Movie', poster_path: null, overview: '', vote_average: 0 };
                         }
                     }
+                    emitToUser(fid, 'cine_match:partner_swiped', {
+                        tmdbId: tid,
+                        direction,
+                        fromUserId: userId,
+                    });
                 }
             }
 
@@ -167,10 +275,6 @@ export function postCineMatchSwipe(prisma) {
     };
 }
 
-/**
- * POST /cine-match/invite – send Cine-Match invite to a friend (toUserId).
- * Creates or resets invite to PENDING.
- */
 export function postCineMatchInvite(prisma) {
     return async (req, res) => {
         try {
@@ -185,22 +289,59 @@ export function postCineMatchInvite(prisma) {
             if (!follow || follow.status !== 'ACCEPTED') {
                 return res.status(403).json({ error: 'You can only invite users you follow' });
             }
+
+            const sender = await prisma.user.findUnique({
+                where: { id: userId },
+                select: { name: true },
+            });
+
             await prisma.cineMatchInvite.upsert({
                 where: { fromUserId_toUserId: { fromUserId: userId, toUserId } },
                 create: { fromUserId: userId, toUserId, status: 'PENDING' },
-                update: { status: 'PENDING' },
+                update: { status: 'PENDING', sessionId: null },
             });
-            res.json({ status: 'success', message: 'Invite sent' });
+
+            await prisma.notification.deleteMany({
+                where: {
+                    userId: toUserId,
+                    fromUserId: userId,
+                    type: 'CINE_MATCH_INVITE',
+                    isRead: false,
+                },
+            });
+
+            const notif = await prisma.notification.create({
+                data: {
+                    userId: toUserId,
+                    type: 'CINE_MATCH_INVITE',
+                    fromUserId: userId,
+                    message: `${sender.name} wants to match movies with you!`,
+                    isRead: false,
+                    data: { fromUserId: userId },
+                },
+                include: {
+                    fromUser: { select: { id: true, name: true, avatarUrl: true } },
+                },
+            });
+
+            const unreadCount = await prisma.notification.count({
+                where: { userId: toUserId, isRead: false },
+            });
+
+            emitToUser(toUserId, 'notification:new', {
+                notification: notif,
+                unreadCount,
+            });
+
+            res.json({ status: 'success', message: 'Invite sent', notificationId: notif.id });
         } catch (err) {
-            console.error(err);
-            res.status(500).json({ error: 'Failed to send invite' });
+            console.error('postCineMatchInvite:', err);
+            const msg = err?.message || 'Failed to send invite';
+            res.status(500).json({ error: msg });
         }
     };
 }
 
-/**
- * GET /cine-match/invites/pending – list pending invites I received (toUserId = me).
- */
 export function getCineMatchInvitesPending(prisma) {
     return async (req, res) => {
         try {
@@ -220,9 +361,6 @@ export function getCineMatchInvitesPending(prisma) {
     };
 }
 
-/**
- * POST /cine-match/invites/accept/:fromUserId – accept invite from fromUserId.
- */
 export function postCineMatchInviteAccept(prisma) {
     return async (req, res) => {
         try {
@@ -237,11 +375,52 @@ export function postCineMatchInviteAccept(prisma) {
             if (!invite || invite.status !== 'PENDING') {
                 return res.status(404).json({ error: 'Invite not found or already accepted' });
             }
-            await prisma.cineMatchInvite.update({
-                where: { fromUserId_toUserId: { fromUserId, toUserId: userId } },
-                data: { status: 'ACCEPTED' },
+
+            const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+            const u1 = Math.min(fromUserId, userId);
+            const u2 = Math.max(fromUserId, userId);
+
+            const session = await prisma.$transaction(async (tx) => {
+                const sess = await tx.cineMatchSession.create({
+                    data: {
+                        user1Id: u1,
+                        user2Id: u2,
+                        status: 'ACTIVE',
+                        expiresAt,
+                    },
+                });
+                await tx.cineMatchInvite.update({
+                    where: { fromUserId_toUserId: { fromUserId, toUserId: userId } },
+                    data: { status: 'ACCEPTED', sessionId: sess.id },
+                });
+                await tx.notification.updateMany({
+                    where: {
+                        userId,
+                        fromUserId,
+                        type: 'CINE_MATCH_INVITE',
+                    },
+                    data: { isRead: true },
+                });
+                return sess;
             });
-            res.json({ status: 'success', message: 'Invite accepted' });
+
+            const partner = await prisma.user.findUnique({
+                where: { id: userId },
+                select: { id: true, name: true, avatarUrl: true },
+            });
+
+            emitToUser(fromUserId, 'cine_match:partner_joined', {
+                sessionId: session.id,
+                partnerId: userId,
+                partner,
+            });
+
+            const unreadA = await prisma.notification.count({
+                where: { userId: fromUserId, isRead: false },
+            });
+            emitToUser(fromUserId, 'notifications:refresh', { unreadCount: unreadA });
+
+            res.json({ status: 'success', message: 'Invite accepted', sessionId: session.id });
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Failed to accept invite' });
@@ -249,11 +428,6 @@ export function postCineMatchInviteAccept(prisma) {
     };
 }
 
-/**
- * GET /cine-match/partner-status/:friendId – status of session with this friend.
- * Returns { status: 'accepted' | 'pending_sent' | 'pending_received' | 'none' }
- * so the client can show "Matching with X", "Send Invite", or "Waiting for X to join...".
- */
 export function getCineMatchPartnerStatus(prisma) {
     return async (req, res) => {
         try {
@@ -269,7 +443,8 @@ export function getCineMatchPartnerStatus(prisma) {
                 where: { fromUserId_toUserId: { fromUserId: friendId, toUserId: userId } },
             });
             if (sent?.status === 'ACCEPTED' || received?.status === 'ACCEPTED') {
-                return res.json({ status: 'accepted' });
+                const inv = sent?.status === 'ACCEPTED' ? sent : received;
+                return res.json({ status: 'accepted', sessionId: inv?.sessionId ?? null });
             }
             if (sent?.status === 'PENDING') {
                 return res.json({ status: 'pending_sent' });

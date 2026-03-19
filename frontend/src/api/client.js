@@ -14,7 +14,10 @@ export async function api(path, options = {}) {
   if (token) headers.Authorization = `Bearer ${token}`;
   const res = await fetch(url, { ...options, headers });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.message || data.error || res.statusText);
+  if (!res.ok) {
+    const combined = [data.message, data.error, data.details].filter(Boolean).join(' — ');
+    throw new Error(combined || res.statusText);
+  }
   return data;
 }
 
@@ -33,6 +36,8 @@ export const apiRoutes = {
     follow: (id) => api(`/users/${id}/follow`, { method: 'POST' }),
     followAction: (id, action) => api(`/users/${id}/follow/respond`, { method: 'POST', body: JSON.stringify({ action }) }),
     getNotifications: () => api('/users/notifications'),
+    markNotificationRead: (notificationId) =>
+      api(`/users/notifications/${notificationId}/read`, { method: 'PATCH' }),
     markNotificationsRead: () => api('/users/notifications/read', { method: 'POST' }),
 
     watchlist: (id) => api(`/users/${id}/watchlist`),
@@ -87,6 +92,7 @@ export const apiRoutes = {
     invitesPending: () => api('/cine-match/invites/pending'),
     acceptInvite: (fromUserId) => api(`/cine-match/invites/accept/${fromUserId}`, { method: 'POST' }),
     partnerStatus: (friendId) => api(`/cine-match/partner-status/${friendId}`),
+    activeSession: () => api('/cine-match/session/active'),
   },
 };
 

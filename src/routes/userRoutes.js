@@ -1,5 +1,5 @@
 import express from 'express';
-import { getPublicProfile, getPublicWatchlist, getWatchlistFeed, getUserPreview, toggleFollow, getTopGenres, getNotifications, markNotificationsAsRead, respondToFollowRequest } from '../controllers/usercontroller.js';
+import { getPublicProfile, getPublicWatchlist, getWatchlistFeed, getUserPreview, toggleFollow, getTopGenres, getNotifications, markNotificationsAsRead, markNotificationRead, respondToFollowRequest } from '../controllers/usercontroller.js';
 import { getActivityFeed } from '../controllers/feedcontroller.js';
 import {
     listWatchlistComments,
@@ -30,6 +30,7 @@ function userRoutes(prisma) {
 
     /** Notifications */
     router.get('/notifications', authMiddleware, getNotifications(prisma));
+    router.patch('/notifications/:notificationId/read', authMiddleware, markNotificationRead(prisma));
     router.post('/notifications/read', authMiddleware, markNotificationsAsRead(prisma));
 
     /** Watchlist engagement: comments and likes (more specific routes first) */

@@ -38,6 +38,7 @@ model user{
   cineMatchLikes        cineMatchLike[]
   cineMatchInvitesSent cineMatchInvite[] @relation("CineMatchInviteFrom")
   cineMatchInvitesRecv cineMatchInvite[] @relation("CineMatchInviteTo")
+  cineMatchSessionSwipes cineMatchSessionSwipe[]
 }
 
 model cineMatchLike {
@@ -56,12 +57,43 @@ model cineMatchInvite {
   toUserId   Int
   status     CineMatchInviteStatus @default(PENDING)
   createdAt  DateTime              @default(now())
+  sessionId  String?               @unique
   fromUser   user                  @relation("CineMatchInviteFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
   toUser     user                  @relation("CineMatchInviteTo", fields: [toUserId], references: [id], onDelete: Cascade)
+  session    cineMatchSession?     @relation(fields: [sessionId], references: [id], onDelete: SetNull)
 
   @@unique([fromUserId, toUserId])
   @@index([toUserId])
   @@index([fromUserId])
+}
+
+model cineMatchSession {
+  id        String                  @id @default(uuid())
+  user1Id   Int
+  user2Id   Int
+  status    CineMatchSessionStatus @default(ACTIVE)
+  expiresAt DateTime
+  createdAt DateTime                @default(now())
+  invite    cineMatchInvite?
+  swipes    cineMatchSessionSwipe[]
+}
+
+model cineMatchSessionSwipe {
+  sessionId String
+  userId    Int
+  tmdbId    Int
+  createdAt DateTime @default(now())
+  session   cineMatchSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user      user             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, userId, tmdbId])
+  @@index([sessionId])
+  @@index([userId])
+}
+
+enum CineMatchSessionStatus {
+  ACTIVE
+  ENDED
 }
 
 enum CineMatchInviteStatus {
@@ -103,6 +135,7 @@ enum NotificationType {
   FOLLOW_ACCEPTED
   LIKE_WATCHLIST
   COMMENT_WATCHLIST
+  CINE_MATCH_INVITE
 }
 model movie{
   id          String   @id @default(uuid())

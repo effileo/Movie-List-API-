@@ -19,7 +19,8 @@ import CineVault from './pages/CineVault.jsx';
 import { FilmIcon, SearchIcon, UserIcon, LogOutIcon, ArchiveIcon, BellIcon } from 'lucide-react';
 import { ToastProvider, useToast } from './components/ui/ToastProvider.jsx';
 import NotificationDropdown from './components/notifications/NotificationDropdown.jsx';
-import { apiRoutes } from './api/client.js';
+import { NotificationCountProvider, useNotificationCount } from './context/NotificationCountContext.jsx';
+import RealtimeCineMatchBridge from './components/realtime/RealtimeCineMatchBridge.jsx';
 import './App.css';
 
 
@@ -29,29 +30,12 @@ function Nav() {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const { unreadCount, refreshUnreadCount } = useNotificationCount();
 
-  // Poll for notifications
   useEffect(() => {
     if (!user) return;
-    
-    const checkNotifications = async () => {
-      try {
-        const res = await apiRoutes.users.getNotifications();
-        const count = res.data?.length || 0;
-        if (count > unreadCount) {
-          // Could play a subtle sound or just let the red dot handle it
-        }
-        setUnreadCount(count);
-      } catch (err) {
-        console.error('Notification check failed', err);
-      }
-    };
-
-    checkNotifications();
-    const interval = setInterval(checkNotifications, 30000); // 30s
-    return () => clearInterval(interval);
-  }, [user, unreadCount]);
+    refreshUnreadCount();
+  }, [user, refreshUnreadCount]);
 
   async function handleLogout() {
     await logout();
@@ -154,7 +138,9 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+      <NotificationCountProvider>
       <ToastProvider>
+        <RealtimeCineMatchBridge />
         {/* Expose background setter via context if needed, or window for deep components */}
       <div 
         className="relative min-h-screen w-full bg-cinematic-bg text-cinematic-text overflow-hidden selection:bg-cinematic-accent/30 selection:text-white"
@@ -223,6 +209,7 @@ export default function App() {
         </div>
       </div>
       </ToastProvider>
+      </NotificationCountProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );

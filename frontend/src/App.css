@@ -71,3 +71,126 @@
 .anim-pulse {
   animation: anim-pulse 2s infinite;
 }
+
+/* —— Real-time Cine-Match invite toast (top-right, glass + pulsing Cine-Red border) —— */
+@keyframes incoming-invite-border-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(225, 29, 72, 0.45),
+      0 8px 32px -8px rgba(0, 0, 0, 0.6),
+      0 0 24px -6px rgba(225, 29, 72, 0.35);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2px rgba(225, 29, 72, 0.85),
+      0 12px 40px -8px rgba(0, 0, 0, 0.65),
+      0 0 36px -4px rgba(225, 29, 72, 0.55);
+  }
+}
+
+.incoming-invite-toast-wrap {
+  position: fixed;
+  top: 5.5rem;
+  right: 1.25rem;
+  z-index: 200;
+  max-width: min(22rem, calc(100vw - 2rem));
+  pointer-events: auto;
+}
+
+.incoming-invite-toast {
+  position: relative;
+  padding: 1rem 1.15rem 1rem;
+  border-radius: 1rem;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  animation: incoming-invite-border-pulse 2.2s ease-in-out infinite;
+}
+
+.incoming-invite-toast-glow {
+  position: absolute;
+  inset: -1px;
+  border-radius: 1rem;
+  background: linear-gradient(
+    135deg,
+    rgba(225, 29, 72, 0.15),
+    transparent 40%,
+    rgba(225, 29, 72, 0.08)
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.incoming-invite-toast-icon {
+  position: relative;
+  z-index: 1;
+  color: #fb7185;
+  margin-bottom: 0.35rem;
+}
+
+.incoming-invite-toast-title {
+  position: relative;
+  z-index: 1;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(251, 113, 133, 0.95);
+  margin: 0 0 0.4rem;
+}
+
+.incoming-invite-toast-body {
+  position: relative;
+  z-index: 1;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: #e2e8f0;
+  margin: 0 0 0.85rem;
+}
+
+.incoming-invite-toast-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.incoming-invite-btn {
+  flex: 1;
+  min-width: 6rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.incoming-invite-btn:active {
+  transform: scale(0.98);
+}
+
+.incoming-invite-btn.primary {
+  border: none;
+  background: linear-gradient(145deg, #e11d48, #be123c);
+  color: white;
+  box-shadow: 0 4px 20px -6px rgba(225, 29, 72, 0.7);
+}
+
+.incoming-invite-btn.primary:hover {
+  opacity: 0.95;
+}
+
+.incoming-invite-btn.ghost {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+}
+
+.incoming-invite-btn.ghost:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}

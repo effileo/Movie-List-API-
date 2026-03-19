@@ -202,6 +202,29 @@ export function markNotificationsAsRead(prisma) {
 }
 
 /**
+ * PATCH /users/notifications/:notificationId/read – Mark a single notification as read.
+ */
+export function markNotificationRead(prisma) {
+    return async (req, res) => {
+        try {
+            const userId = req.user.id;
+            const { notificationId } = req.params;
+            const n = await prisma.notification.updateMany({
+                where: { id: notificationId, userId },
+                data: { isRead: true },
+            });
+            if (n.count === 0) {
+                return res.status(404).json({ error: 'Notification not found' });
+            }
+            res.json({ status: 'success' });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Failed to update notification' });
+        }
+    };
+}
+
+/**
  * GET /users/discover/genres – Aggregates most common genres from public watchlists.
  */
 export function getTopGenres(prisma) {

@@ -6,7 +6,7 @@ import { apiRoutes } from '../../api/client';
 
 const PRELOAD_THRESHOLD = 5;
 
-export default function CineMatchStack({ friendId, friends, selectedFriend, partnerStatus }) {
+export default function CineMatchStack({ friendId, friends, selectedFriend, partnerStatus, sessionId }) {
   const [stack, setStack] = useState([]);
   const [loading, setLoading] = useState(true);
   const [match, setMatch] = useState(null); // { movie, friend }
@@ -51,10 +51,14 @@ export default function CineMatchStack({ friendId, friends, selectedFriend, part
     setStack((prev) => prev.slice(1));
 
     try {
+      const useSession = Boolean(
+        sessionId && friendId && partnerStatus === 'accepted'
+      );
       const res = await apiRoutes.cineMatch.swipe({
         tmdbId: movie.id,
         direction,
-        friendId: friendId || undefined,
+        friendId: useSession ? undefined : friendId || undefined,
+        sessionId: useSession ? sessionId : undefined,
       });
       if (res.isMatch && res.friend && res.movie) {
         setMatch({ movie: res.movie, friend: res.friend });
