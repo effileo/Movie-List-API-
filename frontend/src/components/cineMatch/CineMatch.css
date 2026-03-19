@@ -54,8 +54,321 @@
   border-color: rgba(255, 255, 255, 0.2);
 }
 
+/* ── Partner Selection: Friend Selector bar ── */
+.cine-match-selector {
+  margin-bottom: 1rem;
+}
+
+.cine-match-selector-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.cine-match-selector-item {
+  flex-shrink: 0;
+}
+
+.cine-match-solo-toggle {
+  padding: 0.5rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cine-match-solo-toggle:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.cine-match-solo-toggle.active {
+  border-color: var(--color-cinematic-accent, #e11d48);
+  background: rgba(225, 29, 72, 0.15);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(225, 29, 72, 0.25);
+}
+
+.cine-match-selector-avatars {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 0.25rem 0;
+  max-width: 100%;
+}
+.cine-match-selector-avatars::-webkit-scrollbar {
+  display: none;
+}
+
+.cine-match-selector-avatar {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: #16161a;
+  padding: 0;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.cine-match-selector-avatar:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.cine-match-selector-avatar.active {
+  border-color: var(--color-cinematic-accent, #e11d48);
+  box-shadow: 0 0 20px rgba(225, 29, 72, 0.4);
+}
+
+.cine-match-selector-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cine-match-selector-plus-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.cine-match-selector-plus {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.03);
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cine-match-selector-plus:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.cine-match-selector-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 0.5rem;
+  min-width: 220px;
+  padding: 0.75rem;
+  background: rgba(22, 22, 26, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 0 40px -15px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+}
+
+.cine-match-selector-search {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.cine-match-selector-search::placeholder {
+  color: #94a3b8;
+}
+
+.cine-match-selector-search:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.cine-match-selector-dropdown-list {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 0.5rem;
+}
+
+.cine-match-selector-dropdown-empty {
+  margin: 0;
+  padding: 0.5rem;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.cine-match-selector-dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s;
+}
+
+.cine-match-selector-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.cine-match-selector-dropdown-item img,
+.cine-match-selector-dropdown-item span:first-of-type {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: #16161a;
+  flex-shrink: 0;
+}
+
+.cine-match-selector-find-more {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.cine-match-selector-find-more:hover {
+  color: var(--color-cinematic-accent, #e11d48);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.cine-match-matching-label {
+  margin: 0.75rem 0 0;
+  font-size: 0.9rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.cine-match-send-invite-wrap {
+  margin-top: 0.5rem;
+}
+
+.cine-match-send-invite-btn {
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  border: none;
+  background: var(--color-cinematic-accent, #e11d48);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.cine-match-send-invite-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.cine-match-send-invite-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Pending invites I received */
+.cine-match-pending-received {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cine-match-invite-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.cine-match-invite-accept-btn {
+  padding: 0.35rem 0.85rem;
+  border-radius: 8px;
+  border: none;
+  background: var(--color-cinematic-accent, #e11d48);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.cine-match-invite-accept-btn:hover {
+  opacity: 0.9;
+}
+
+/* Waiting overlay (glassmorphic) */
+.cine-match-waiting-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  margin: 0 1rem;
+}
+
+.cine-match-waiting-text {
+  margin: 0 0 0.35rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.cine-match-waiting-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
 /* Stack container */
 .cine-match-stack-wrap {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;

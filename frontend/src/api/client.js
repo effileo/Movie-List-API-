@@ -83,6 +83,10 @@ export const apiRoutes = {
     friends: () => api('/cine-match/friends'),
     stack: () => api('/cine-match/stack'),
     swipe: (body) => api('/cine-match/swipe', { method: 'POST', body: JSON.stringify(body) }),
+    invite: (toUserId) => api('/cine-match/invite', { method: 'POST', body: JSON.stringify({ toUserId }) }),
+    invitesPending: () => api('/cine-match/invites/pending'),
+    acceptInvite: (fromUserId) => api(`/cine-match/invites/accept/${fromUserId}`, { method: 'POST' }),
+    partnerStatus: (friendId) => api(`/cine-match/partner-status/${friendId}`),
   },
 };
 

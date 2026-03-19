@@ -36,6 +36,8 @@ model user{
   notifications         notification[]         @relation("NotificationTo")
   fromNotifications     notification[]         @relation("NotificationFrom")
   cineMatchLikes        cineMatchLike[]
+  cineMatchInvitesSent cineMatchInvite[] @relation("CineMatchInviteFrom")
+  cineMatchInvitesRecv cineMatchInvite[] @relation("CineMatchInviteTo")
 }
 
 model cineMatchLike {
@@ -47,6 +49,24 @@ model cineMatchLike {
   @@unique([userId, tmdbId])
   @@index([userId])
   @@index([tmdbId])
+}
+
+model cineMatchInvite {
+  fromUserId Int
+  toUserId   Int
+  status     CineMatchInviteStatus @default(PENDING)
+  createdAt  DateTime              @default(now())
+  fromUser   user                  @relation("CineMatchInviteFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser     user                  @relation("CineMatchInviteTo", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  @@unique([fromUserId, toUserId])
+  @@index([toUserId])
+  @@index([fromUserId])
+}
+
+enum CineMatchInviteStatus {
+  PENDING
+  ACCEPTED
 }
 
 model follow {

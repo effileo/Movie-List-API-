@@ -6,7 +6,7 @@ import { apiRoutes } from '../../api/client';
 
 const PRELOAD_THRESHOLD = 5;
 
-export default function CineMatchStack({ friendId, friends }) {
+export default function CineMatchStack({ friendId, friends, selectedFriend, partnerStatus }) {
   const [stack, setStack] = useState([]);
   const [loading, setLoading] = useState(true);
   const [match, setMatch] = useState(null); // { movie, friend }
@@ -66,8 +66,16 @@ export default function CineMatchStack({ friendId, friends }) {
 
   const topCards = stack.slice(0, 3);
 
+  const waitingForPartner = partnerStatus === 'pending_sent' && selectedFriend;
+
   return (
     <div className="cine-match-stack-wrap">
+      {waitingForPartner && (
+        <div className="cine-match-waiting-overlay">
+          <p className="cine-match-waiting-text">Waiting for {selectedFriend.name} to join…</p>
+          <p className="cine-match-waiting-hint">They’ll need to accept your invite or open Cine-Match.</p>
+        </div>
+      )}
       {loading && stack.length === 0 ? (
         <div className="cine-match-stack-skeleton">
           <div className="cine-match-skeleton-poster" />

@@ -166,3 +166,121 @@ export function postCineMatchSwipe(prisma) {
         }
     };
 }
+
+/**
+ * POST /cine-match/invite – send Cine-Match invite to a friend (toUserId).
+ * Creates or resets invite to PENDING.
+ */
+export function postCineMatchInvite(prisma) {
+    return async (req, res) => {
+        try {
+            const userId = req.user.id;
+            const toUserId = parseInt(req.body.toUserId, 10);
+            if (Number.isNaN(toUserId) || toUserId === userId) {
+                return res.status(400).json({ error: 'Invalid toUserId' });
+            }
+            const follow = await prisma.follow.findUnique({
+                where: { followerId_followedId: { followerId: userId, followedId: toUserId } },
+            });
+            if (!follow || follow.status !== 'ACCEPTED') {
+                return res.status(403).json({ error: 'You can only invite users you follow' });
+            }
+            await prisma.cineMatchInvite.upsert({
+                where: { fromUserId_toUserId: { fromUserId: userId, toUserId } },
+                create: { fromUserId: userId, toUserId, status: 'PENDING' },
+                update: { status: 'PENDING' },
+            });
+            res.json({ status: 'success', message: 'Invite sent' });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Failed to send invite' });
+        }
+    };
+}
+
+/**
+ * GET /cine-match/invites/pending – list pending invites I received (toUserId = me).
+ */
+export function getCineMatchInvitesPending(prisma) {
+    return async (req, res) => {
+        try {
+            const userId = req.user.id;
+            const invites = await prisma.cineMatchInvite.findMany({
+                where: { toUserId: userId, status: 'PENDING' },
+                select: {
+                    fromUserId: true,
+                    fromUser: { select: { id: true, name: true, avatarUrl: true } },
+                },
+            });
+            res.json({ data: invites.map(i => ({ fromUserId: i.fromUserId, user: i.fromUser })) });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Failed to load invites' });
+        }
+    };
+}
+
+/**
+ * POST /cine-match/invites/accept/:fromUserId – accept invite from fromUserId.
+ */
+export function postCineMatchInviteAccept(prisma) {
+    return async (req, res) => {
+        try {
+            const userId = req.user.id;
+            const fromUserId = parseInt(req.params.fromUserId, 10);
+            if (Number.isNaN(fromUserId)) {
+                return res.status(400).json({ error: 'Invalid fromUserId' });
+            }
+            const invite = await prisma.cineMatchInvite.findUnique({
+                where: { fromUserId_toUserId: { fromUserId, toUserId: userId } },
+            });
+            if (!invite || invite.status !== 'PENDING') {
+                return res.status(404).json({ error: 'Invite not found or already accepted' });
+            }
+            await prisma.cineMatchInvite.update({
+                where: { fromUserId_toUserId: { fromUserId, toUserId: userId } },
+                data: { status: 'ACCEPTED' },
+            });
+            res.json({ status: 'success', message: 'Invite accepted' });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Failed to accept invite' });
+        }
+    };
+}
+
+/**
+ * GET /cine-match/partner-status/:friendId – status of session with this friend.
+ * Returns { status: 'accepted' | 'pending_sent' | 'pending_received' | 'none' }
+ * so the client can show "Matching with X", "Send Invite", or "Waiting for X to join...".
+ */
+export function getCineMatchPartnerStatus(prisma) {
+    return async (req, res) => {
+        try {
+            const userId = req.user.id;
+            const friendId = parseInt(req.params.friendId, 10);
+            if (Number.isNaN(friendId)) {
+                return res.status(400).json({ error: 'Invalid friendId' });
+            }
+            const sent = await prisma.cineMatchInvite.findUnique({
+                where: { fromUserId_toUserId: { fromUserId: userId, toUserId: friendId } },
+            });
+            const received = await prisma.cineMatchInvite.findUnique({
+                where: { fromUserId_toUserId: { fromUserId: friendId, toUserId: userId } },
+            });
+            if (sent?.status === 'ACCEPTED' || received?.status === 'ACCEPTED') {
+                return res.json({ status: 'accepted' });
+            }
+            if (sent?.status === 'PENDING') {
+                return res.json({ status: 'pending_sent' });
+            }
+            if (received?.status === 'PENDING') {
+                return res.json({ status: 'pending_received' });
+            }
+            res.json({ status: 'none' });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Failed to get partner status' });
+        }
+    };
+}
