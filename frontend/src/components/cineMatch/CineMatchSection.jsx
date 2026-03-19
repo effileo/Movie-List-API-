@@ -128,7 +128,7 @@ export default function CineMatchSection() {
       console.error('Invite failed', err);
       const msg =
         err?.message ||
-        'Could not send invite. You can only invite people you follow.';
+        'Could not send invite. You must have an accepted follow with them (either direction).';
       showToast(msg, 'error');
     } finally {
       setSendingInvite(false);
@@ -150,13 +150,17 @@ export default function CineMatchSection() {
 
   const matchWithLabel = soloMode
     ? 'Solo Mode'
-    : selectedFriend && (partnerStatus === 'accepted' || partnerStatus === 'pending_sent')
-      ? `Matching with ${selectedFriend.name}`
-      : selectedFriend
-        ? partnerStatus === 'pending_received'
-          ? `${selectedFriend.name} invited you — tap Join above`
-          : 'Tap Send Invite to notify them'
-        : 'Select a partner';
+    : loadingFriends
+      ? 'Loading connections…'
+      : !friends.length
+        ? 'Add connections via Discover to invite someone'
+        : selectedFriend && (partnerStatus === 'accepted' || partnerStatus === 'pending_sent')
+          ? `Matching with ${selectedFriend.name}`
+          : selectedFriend
+            ? partnerStatus === 'pending_received'
+              ? `${selectedFriend.name} invited you — tap Join above`
+              : 'Tap Send Invite to notify them'
+            : 'Select a partner';
 
   return (
     <section className="cine-match-section">
@@ -166,6 +170,7 @@ export default function CineMatchSection() {
 
         <FriendSelector
           friends={friends}
+          loadingFriends={loadingFriends}
           selectedFriendId={soloMode ? null : friendId}
           onSelectFriend={setFriendId}
           soloMode={soloMode}

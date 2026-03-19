@@ -150,26 +150,57 @@ const cloneWatchlist = (prisma) => async (req, res) => {
     });
     const myMovieIds = new Set(myItems.map((i) => i.movieId));
 
-    // Filter out movies already in our watchlist
-    const newItemsData = targetItems
-        .filter((item) => !myMovieIds.has(item.movieId))
-        .map((item) => ({
-            userId,
-            movieId: item.movieId,
-            status: 'PLANNED',
-        }));
+    // Filter + dedupe by movieId (target list shouldn’t duplicate, but be safe for DB quirks)
+    const pending = new Map();
+    for (const item of targetItems) {
+        if (myMovieIds.has(item.movieId)) continue;
+        if (!pending.has(item.movieId)) {
+            pending.set(item.movieId, {
+                userId,
+                movieId: item.movieId,
+                status: 'PLANNED',
+            });
+        }
+    }
+    const newItemsData = [...pending.values()];
 
     if (newItemsData.length === 0) {
-        return res.json({ status: 'success', message: 'All movies are already in your watchlist' });
+        return res.status(200).json({
+            status: 'success',
+            clonedCount: 0,
+            message: 'All of these movies are already in your watchlist',
+        });
     }
 
-    // Bulk create
-    await prisma.watchListItem.createMany({
+    let inserted = 0;
+    const batch = await prisma.watchListItem.createMany({
         data: newItemsData,
         skipDuplicates: true,
     });
+    inserted = batch.count;
 
-    return res.status(201).json({ status: 'success', clonedCount: newItemsData.length });
+    // If createMany reported 0 (e.g. adapter/edge case) but we expected rows, insert one-by-one
+    if (inserted === 0 && newItemsData.length > 0) {
+        for (const row of newItemsData) {
+            try {
+                await prisma.watchListItem.create({ data: row });
+                inserted += 1;
+            } catch (e) {
+                if (e?.code === 'P2002') continue;
+                throw e;
+            }
+        }
+    }
+
+    if (inserted === 0) {
+        return res.status(200).json({
+            status: 'success',
+            clonedCount: 0,
+            message: 'All of these movies are already in your watchlist',
+        });
+    }
+
+    return res.status(201).json({ status: 'success', clonedCount: inserted });
 };
 
-export { addToWatchList, deleteFromWatchlist, updateWatchlistItem, getMyWatchlist, cloneWatchlist };
+export { addToWatchList, deleteFromWatchlist, updateWatchlistItem, getMyWatchlist, cloneWatchlist };

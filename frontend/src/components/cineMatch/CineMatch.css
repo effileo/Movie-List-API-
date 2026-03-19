@@ -55,6 +55,32 @@
 }
 
 /* ── Partner Selection: Friend Selector bar ── */
+.cine-match-friends-loading {
+  font-size: 0.75rem;
+  color: rgba(148, 163, 184, 0.9);
+  padding: 0 0.5rem;
+  white-space: nowrap;
+}
+
+.cine-match-friends-empty {
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: rgba(148, 163, 184, 0.95);
+  margin: 0.75rem 0 0;
+  max-width: 28rem;
+}
+
+.cine-match-friends-empty-link {
+  color: #fb7185;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.cine-match-friends-empty-link:hover {
+  color: #fda4af;
+}
+
 .cine-match-selector {
   margin-bottom: 1rem;
 }

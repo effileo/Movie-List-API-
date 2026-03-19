@@ -13,7 +13,10 @@ export default function UserCardHeader({ user }) {
   const [status, setStatus] = useState(user.followStatus || null);
   const [loading, setLoading] = useState(false);
 
-  const isSelf = currentUser?.id === user.id;
+  const isSelf =
+    currentUser != null &&
+    user?.id != null &&
+    Number(currentUser.id) === Number(user.id);
 
   function timeAgo(date) {
     if (!date) return '';

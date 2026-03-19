@@ -4,6 +4,7 @@ import { PlusIcon, UserPlusIcon } from 'lucide-react';
 
 export default function FriendSelector({
   friends,
+  loadingFriends = false,
   selectedFriendId,
   onSelectFriend,
   soloMode,
@@ -48,25 +49,29 @@ export default function FriendSelector({
 
         {/* Scrollable avatars */}
         <div className="cine-match-selector-avatars">
-          {friends.map((friend) => (
-            <button
-              key={friend.id}
-              type="button"
-              className={`cine-match-selector-avatar ${Number(selectedFriendId) === Number(friend.id) && !soloMode ? 'active' : ''}`}
-              onClick={() => {
-                onSoloModeChange(false);
-                onSelectFriend(friend.id);
-                setDropdownOpen(false);
-              }}
-              title={friend.name}
-            >
-              {friend.avatarUrl ? (
-                <img src={friend.avatarUrl} alt={friend.name} />
-              ) : (
-                <span>{friend.name?.slice(0, 2)?.toUpperCase() ?? '?'}</span>
-              )}
-            </button>
-          ))}
+          {loadingFriends ? (
+            <span className="cine-match-friends-loading">Loading friends…</span>
+          ) : (
+            friends.map((friend) => (
+              <button
+                key={friend.id}
+                type="button"
+                className={`cine-match-selector-avatar ${Number(selectedFriendId) === Number(friend.id) && !soloMode ? 'active' : ''}`}
+                onClick={() => {
+                  onSoloModeChange(false);
+                  onSelectFriend(friend.id);
+                  setDropdownOpen(false);
+                }}
+                title={friend.name}
+              >
+                {friend.avatarUrl ? (
+                  <img src={friend.avatarUrl} alt={friend.name} />
+                ) : (
+                  <span>{friend.name?.slice(0, 2)?.toUpperCase() ?? '?'}</span>
+                )}
+              </button>
+            ))
+          )}
         </div>
 
         {/* Plus: open dropdown to search/select friend */}
@@ -126,6 +131,16 @@ export default function FriendSelector({
           )}
         </div>
       </div>
+
+      {!loadingFriends && friends.length === 0 && (
+        <p className="cine-match-friends-empty">
+          No connections yet. Follow someone (or accept their follow) on{' '}
+          <Link to="/discover" className="cine-match-friends-empty-link">
+            Discover
+          </Link>{' '}
+          — then they’ll show up here for Cine-Match.
+        </p>
+      )}
 
       {/* Pending invites I received: accept prompt */}
       {pendingInvites.length > 0 && (

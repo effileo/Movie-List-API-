@@ -12,7 +12,11 @@ export async function api(path, options = {}) {
   };
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
-  const res = await fetch(url, { ...options, headers });
+  const res = await fetch(url, {
+    ...options,
+    headers,
+    cache: options.cache ?? 'no-store',
+  });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     const combined = [data.message, data.error, data.details].filter(Boolean).join(' — ');

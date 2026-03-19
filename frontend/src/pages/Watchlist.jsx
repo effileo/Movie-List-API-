@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { apiRoutes, TMDB_IMG, posterUrl, POSTER_PLACEHOLDER } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -21,18 +21,29 @@ export default function Watchlist() {
     });
   }
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const { data } = await apiRoutes.watchlist.list();
-        setItems(data || []);
-      } catch (err) {
-        setError(err.message || 'Failed to load watchlist');
-      } finally {
-        setLoading(false);
-      }
-    })();
+  const loadWatchlist = useCallback(async () => {
+    try {
+      setError('');
+      const { data } = await apiRoutes.watchlist.list();
+      setItems(data || []);
+    } catch (err) {
+      setError(err.message || 'Failed to load watchlist');
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    loadWatchlist();
+  }, [loadWatchlist]);
+
+  /** Discover “Clone” dispatches this so the list updates without a full refresh */
+  useEffect(() => {
+    const onUpdated = () => loadWatchlist();
+    window.addEventListener('watchlist:updated', onUpdated);
+    return () => window.removeEventListener('watchlist:updated', onUpdated);
+  }, [loadWatchlist]);
 
   async function handleRemove(id) {
     setUpdating(id);

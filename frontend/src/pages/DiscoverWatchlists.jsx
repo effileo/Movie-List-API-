@@ -81,7 +81,8 @@ export default function DiscoverWatchlists() {
   const filteredFeed = useMemo(() => {
     let result = feed;
     if (currentUser) {
-      result = result.filter(u => u.id !== currentUser.id);
+      const me = Number(currentUser.id);
+      result = result.filter((u) => Number(u.id) !== me);
     }
     if (!activeTag) return result;
     return result.filter(u =>
@@ -170,13 +171,20 @@ export default function DiscoverWatchlists() {
         <DiscoverEmptyState
           hasFilter={!!activeTag}
           onClearFilter={() => setActiveTag(null)}
-          suggestedUsers={feed.filter(u => currentUser?.id !== u.id).slice(0, 6)}
+          suggestedUsers={feed
+            .filter((u) => Number(u.id) !== Number(currentUser?.id))
+            .slice(0, 6)}
         />
       ) : (
         <motion.div className="discover-feed" layout>
           <AnimatePresence mode="popLayout">
             {sortedFeed.map((watchlist) => (
-              <WatchlistCard key={watchlist.id} watchlist={watchlist} loading={false} />
+              <WatchlistCard
+                key={watchlist.id}
+                watchlist={watchlist}
+                loading={false}
+                currentUserId={currentUser?.id != null ? Number(currentUser.id) : null}
+              />
             ))}
           </AnimatePresence>
         </motion.div>

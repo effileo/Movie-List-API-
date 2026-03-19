@@ -5,10 +5,12 @@ import { HeartIcon, MessageCircleIcon, CopyIcon, ExternalLinkIcon, ChevronDownIc
 import PosterStrip from './PosterStrip';
 import UserCardHeader from './UserCardHeader';
 import { apiRoutes } from '../../api/client';
+import { useToast } from '../ui/ToastProvider';
 
 const CARD_MIN_HEIGHT = 320;
 
-export default function WatchlistCard({ watchlist, loading = false }) {
+export default function WatchlistCard({ watchlist, loading = false, currentUserId = null }) {
+  const { showToast } = useToast();
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(watchlist?.likeCount ?? 0);
   const [cloning, setCloning] = useState(false);
@@ -32,16 +34,34 @@ export default function WatchlistCard({ watchlist, loading = false }) {
     }
   };
 
+  const targetUserId = watchlist?.id != null ? Number(watchlist.id) : NaN;
+  const isOwnWatchlist =
+    currentUserId != null && !Number.isNaN(targetUserId) && targetUserId === Number(currentUserId);
+
   const handleClone = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (cloning || cloned || !watchlist?.id) return;
+    if (cloning || cloned || Number.isNaN(targetUserId)) return;
+    if (isOwnWatchlist) {
+      showToast('You already have your own watchlist — open Watchlist to edit it.', 'error');
+      return;
+    }
     setCloning(true);
     try {
-      await apiRoutes.watchlist.clone(watchlist.id);
+      const res = await apiRoutes.watchlist.clone(targetUserId);
+      const count = res?.clonedCount ?? 0;
+      if (count > 0) {
+        showToast(
+          `Added ${count} movie${count === 1 ? '' : 's'} to your watchlist!`
+        );
+        window.dispatchEvent(new CustomEvent('watchlist:updated'));
+      } else {
+        showToast(res?.message || 'Those movies are already in your watchlist.');
+      }
       setCloned(true);
     } catch (err) {
       console.error('Clone failed', err);
+      showToast(err?.message || 'Could not clone this watchlist.', 'error');
     } finally {
       setCloning(false);
     }
@@ -135,7 +155,7 @@ export default function WatchlistCard({ watchlist, loading = false }) {
             type="button"
             className={`discover-action-btn clone-btn ${cloned ? 'success' : ''}`}
             onClick={handleClone}
-            disabled={cloning || cloned}
+            disabled={cloning || cloned || isOwnWatchlist}
             aria-label={cloned ? 'Saved' : 'Clone watchlist'}
           >
             {cloned ? (

@@ -3,6 +3,22 @@ import { emitToUser } from '../realtime/emit.js';
 
 const TMDB_BASE = 'https://api.themoviedb.org/3';
 
+/** True if either user follows the other with an accepted follow (Cine-Match “connected”). */
+async function hasAcceptedFollowPair(prisma, userId, otherUserId) {
+    const [out, inc] = await Promise.all([
+        prisma.follow.findUnique({
+            where: { followerId_followedId: { followerId: userId, followedId: otherUserId } },
+        }),
+        prisma.follow.findUnique({
+            where: { followerId_followedId: { followerId: otherUserId, followedId: userId } },
+        }),
+    ]);
+    return (
+        (out?.status === 'ACCEPTED') ||
+        (inc?.status === 'ACCEPTED')
+    );
+}
+
 async function discoverStack(genreIds, excludedTmdbIds = [], limit = 20) {
     const key = process.env.TMDB_API_KEY;
     if (!key) return [];
@@ -19,20 +35,37 @@ export function getCineMatchFriends(prisma) {
     return async (req, res) => {
         try {
             const userId = req.user.id;
-            const follows = await prisma.follow.findMany({
-                where: { followerId: userId, status: 'ACCEPTED' },
-                select: {
-                    followedId: true,
-                    followed: {
-                        select: { id: true, name: true, avatarUrl: true },
+            // People I follow (accepted) + people who follow me (accepted) — either direction counts as “connected”
+            const [outgoing, incoming] = await Promise.all([
+                prisma.follow.findMany({
+                    where: { followerId: userId, status: 'ACCEPTED' },
+                    select: {
+                        followed: {
+                            select: { id: true, name: true, avatarUrl: true },
+                        },
                     },
-                },
+                }),
+                prisma.follow.findMany({
+                    where: { followedId: userId, status: 'ACCEPTED' },
+                    select: {
+                        follower: {
+                            select: { id: true, name: true, avatarUrl: true },
+                        },
+                    },
+                }),
+            ]);
+            const byId = new Map();
+            outgoing.forEach((row) => {
+                const u = row.followed;
+                byId.set(u.id, { id: u.id, name: u.name, avatarUrl: u.avatarUrl });
             });
-            const friends = follows.map(f => ({
-                id: f.followed.id,
-                name: f.followed.name,
-                avatarUrl: f.followed.avatarUrl,
-            }));
+            incoming.forEach((row) => {
+                const u = row.follower;
+                byId.set(u.id, { id: u.id, name: u.name, avatarUrl: u.avatarUrl });
+            });
+            const friends = Array.from(byId.values()).sort((a, b) =>
+                (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' })
+            );
             res.json({ data: friends });
         } catch (err) {
             console.error(err);
@@ -283,11 +316,11 @@ export function postCineMatchInvite(prisma) {
             if (Number.isNaN(toUserId) || toUserId === userId) {
                 return res.status(400).json({ error: 'Invalid toUserId' });
             }
-            const follow = await prisma.follow.findUnique({
-                where: { followerId_followedId: { followerId: userId, followedId: toUserId } },
-            });
-            if (!follow || follow.status !== 'ACCEPTED') {
-                return res.status(403).json({ error: 'You can only invite users you follow' });
+            const connected = await hasAcceptedFollowPair(prisma, userId, toUserId);
+            if (!connected) {
+                return res.status(403).json({
+                    error: 'You can only invite people you’re connected with (accepted follow in either direction).',
+                });
             }
 
             const sender = await prisma.user.findUnique({
