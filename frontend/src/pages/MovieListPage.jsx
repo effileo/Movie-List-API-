@@ -4,6 +4,11 @@ import { apiRoutes, TMDB_IMG } from '../api/client.js';
 import './Movies.css';
 
 const LIST_CONFIG = {
+  trending: {
+    title: 'Trending now',
+    subtitle: 'The most talked about movies this week',
+    api: (page) => apiRoutes.movies.trending('week', page),
+  },
   popular: { title: 'Popular now', subtitle: 'Most viewed this week', api: (page) => apiRoutes.movies.popular(page) },
   'top-rated': { title: 'Top rated', subtitle: 'Highest rated of all time', api: (page) => apiRoutes.movies.topRated(page) },
 };
