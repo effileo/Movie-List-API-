@@ -13,11 +13,12 @@ export default function ForYouSection() {
   const { user } = useAuth();
 
   // Use React Query for caching recommendations
-  const { data, isLoading, isError, refetch } = useQuery({
+  const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
     queryKey: ['recommendations', surveyGenres],
     queryFn: () => apiRoutes.users.recommendations(surveyGenres),
-    enabled: !!user, // Only run the query if the user is authenticated
-    // If the backend returns needsOnboarding, that's fine, we handle it in state.
+    enabled: !!user,
+    retry: 2,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000),
   });
 
   const handleSurveySubmit = async (selectedIds) => {
@@ -52,7 +53,7 @@ export default function ForYouSection() {
           <h3 className="text-xl font-bold text-white mb-2">Want personalized recommendations?</h3>
           <p className="text-cinematic-muted mb-8">Sign in to kickstart our AI recommendation engine.</p>
           <Link to="/login" className="px-8 py-4 rounded-full bg-cinematic-accent hover:opacity-90 text-white font-bold tracking-wide transition-colors shadow-[0_0_40px_-15px_rgba(0,0,0,0.5)]">
-            Sign In to HealthNet
+            Sign in to Cinéverse
           </Link>
         </div>
       </section>
@@ -68,10 +69,30 @@ export default function ForYouSection() {
   }
 
   if (isError) {
+    const msg = error?.message?.trim() || 'Could not reach the server.';
     return (
-      <div className="w-full text-center py-10 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400">
-        Failed to load recommendations. Please try again.
-      </div>
+      <section className="w-full">
+        <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-8 pb-4 border-b border-cinematic-border/50 gap-4">
+          <div>
+            <h2 className="text-3xl font-black tracking-tight text-white mb-1">For You</h2>
+            <p className="text-cinematic-muted text-sm tracking-wide">
+              Personalized picks based on your watchlist and ratings.
+            </p>
+          </div>
+        </div>
+        <div className="w-full text-center py-12 px-4 bg-red-500/10 border border-red-500/20 rounded-2xl">
+          <p className="text-red-300/95 text-sm font-medium mb-1">Failed to load recommendations</p>
+          <p className="text-cinematic-muted text-xs mb-6 max-w-md mx-auto break-words">{msg}</p>
+          <button
+            type="button"
+            disabled={isFetching}
+            onClick={() => refetch()}
+            className="inline-flex items-center justify-center rounded-full border border-red-400/50 bg-red-500/10 px-6 py-2.5 text-sm font-semibold text-red-200 hover:bg-red-500/20 transition-colors disabled:opacity-50"
+          >
+            {isFetching ? 'Retrying…' : 'Try again'}
+          </button>
+        </div>
+      </section>
     );
   }
 

@@ -1,4 +1,4 @@
-import { fetchMovieById } from '../services/tmdb.js';
+import { fetchPopularMovies } from '../services/tmdb.js';
 
 // Simple map of common TMDB genre IDs for the empty-state survey and text mapping
 export const GENRE_MAP = {
@@ -9,52 +9,99 @@ export const GENRE_MAP = {
     10770: 'TV Movie', 53: 'Thriller', 10752: 'War', 37: 'Western'
 };
 
+/**
+ * Only these movie columns are loaded. Omitting voteAverage keeps this endpoint working
+ * when the DB has not yet applied the migration that adds that column.
+ */
+const RECOMMENDATION_MOVIE_SELECT = {
+    id: true,
+    tmdbId: true,
+    title: true,
+    year: true,
+    genre: true,
+    runTime: true,
+    Overview: true,
+    posterPath: true,
+    backdropPath: true,
+    createdAt: true,
+    createdBy: true,
+};
+
 const TMDB_BASE = 'https://api.themoviedb.org/3';
 
 // Helper to fetch cast for a specific TMDB movie ID
 async function fetchMovieCredits(tmdbId) {
-    const key = process.env.TMDB_API_KEY;
-    const url = `${TMDB_BASE}/movie/${tmdbId}/credits?api_key=${key}`;
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    return res.json();
+    const key = process.env.TMDB_API_KEY?.trim();
+    if (!key || tmdbId == null) return null;
+    try {
+        const url = `${TMDB_BASE}/movie/${tmdbId}/credits?api_key=${key}`;
+        const res = await fetch(url);
+        if (!res.ok) return null;
+        return await res.json();
+    } catch (e) {
+        console.warn('fetchMovieCredits failed', tmdbId, e?.message);
+        return null;
+    }
+}
+
+function normalizeExcludedIds(ids) {
+    const set = new Set();
+    for (const id of ids) {
+        if (id == null) continue;
+        const n = Number(id);
+        if (!Number.isNaN(n)) set.add(n);
+    }
+    return set;
 }
 
 // Discover movies based on TMDB IDs for genres/actors
-async function discoverRecommendations(genreIds, castIds, excludedTmdbIds = []) {
-    const key = process.env.TMDB_API_KEY;
-    
-    let url = `${TMDB_BASE}/discover/movie?api_key=${key}&sort_by=popularity.desc&page=1`;
-    if (genreIds?.length) url += `&with_genres=${genreIds.join(',')}`;
-    if (castIds?.length) url += `&with_cast=${castIds.join(',')}`;
-    
-    // We want high quality recs
-    url += '&vote_count.gte=100&vote_average.gte=6.5';
-    
-    const res = await fetch(url);
-    if (!res.ok) return [];
-    
-    const data = await res.json();
-    let results = data.results || [];
-    
-    // Filter out movies the user has already watched/watchlisted
-    results = results.filter(movie => !excludedTmdbIds.includes(movie.id));
-    return results;
+async function discoverRecommendations(genreIds, castIds, excludedTmdbIds = [], { relaxed = false } = {}) {
+    const key = process.env.TMDB_API_KEY?.trim();
+    if (!key) return [];
+
+    const excluded = normalizeExcludedIds(excludedTmdbIds);
+
+    try {
+        let url = `${TMDB_BASE}/discover/movie?api_key=${key}&sort_by=popularity.desc&page=1`;
+        if (genreIds?.length) url += `&with_genres=${genreIds.join(',')}`;
+        if (castIds?.length) url += `&with_cast=${castIds.join(',')}`;
+
+        if (!relaxed) {
+            url += '&vote_count.gte=100&vote_average.gte=6.5';
+        } else {
+            url += '&vote_count.gte=40&vote_average.gte=5.5';
+        }
+
+        const res = await fetch(url);
+        if (!res.ok) return [];
+
+        const data = await res.json();
+        let results = data.results || [];
+
+        results = results.filter((movie) => movie?.id != null && !excluded.has(Number(movie.id)));
+        return results;
+    } catch (e) {
+        console.warn('discoverRecommendations failed', e?.message);
+        return [];
+    }
 }
 
 export const getRecommendations = (prisma) => async (req, res) => {
     try {
-        const userId = req.user.id;
-        
+        const userId = Number(req.user.id);
+        if (Number.isNaN(userId)) {
+            return res.status(400).json({ error: 'Invalid user' });
+        }
+
         // 1. Fetch user's entire watchlist to analyze and exclude
         const watchlist = await prisma.watchListItem.findMany({
             where: { userId },
-            include: { movie: true }
+            include: { movie: { select: RECOMMENDATION_MOVIE_SELECT } },
         });
-        
+
         // 1.5 Handle Empty State or Survey Kickstart
-        const surveyGenres = req.query.genres ? req.query.genres.split(',') : [];
-        const excludedTmdbIds = watchlist.map(item => item.movie.tmdbId).filter(Boolean);
+        const surveyGenres = req.query.genres ? req.query.genres.split(',').map((g) => g.trim()).filter(Boolean) : [];
+        const excludedTmdbIds = watchlist.map((item) => item.movie.tmdbId).filter((id) => id != null);
 
         if (watchlist.length === 0 && surveyGenres.length === 0) {
             return res.json({ needsOnboarding: true, results: [] });
@@ -133,8 +180,8 @@ export const getRecommendations = (prisma) => async (req, res) => {
         const actorIdToUse = topActors.length > 0 ? topActors[0].id : null;
         
         let recs = await discoverRecommendations(
-            topGenreIds, 
-            actorIdToUse ? [actorIdToUse] : [], 
+            topGenreIds,
+            actorIdToUse ? [actorIdToUse] : [],
             excludedTmdbIds
         );
 
@@ -144,8 +191,29 @@ export const getRecommendations = (prisma) => async (req, res) => {
             recs = [...recs, ...fallback];
         }
 
+        if (recs.length < 5) {
+            const relaxed = await discoverRecommendations(topGenreIds, [], excludedTmdbIds, { relaxed: true });
+            recs = [...recs, ...relaxed];
+        }
+
         // Ensure uniqueness and limit to 5 for the Bento grid
-        const uniqueRecs = Array.from(new Map(recs.map(item => [item.id, item])).values()).slice(0, 5);
+        let uniqueRecs = Array.from(new Map(recs.map((item) => [item.id, item])).values()).slice(0, 5);
+
+        if (uniqueRecs.length === 0) {
+            try {
+                const pop = await fetchPopularMovies(1);
+                const excluded = normalizeExcludedIds(excludedTmdbIds);
+                const fromPopular = (pop.results || []).filter(
+                    (m) => m?.id != null && !excluded.has(Number(m.id))
+                );
+                uniqueRecs = fromPopular.slice(0, 5);
+                if (uniqueRecs.length > 0) {
+                    whyBadge = 'Popular on TMDB right now';
+                }
+            } catch (e) {
+                console.warn('popular fallback failed', e?.message);
+            }
+        }
         
         // Append why badges and mock similarity score
         const enhancedRecs = uniqueRecs.map(r => ({
@@ -163,14 +231,17 @@ export const getRecommendations = (prisma) => async (req, res) => {
 
 export const getSurpriseMe = (prisma) => async (req, res) => {
     try {
-        const userId = req.user.id;
-        
+        const userId = Number(req.user.id);
+        if (Number.isNaN(userId)) {
+            return res.status(400).json({ error: 'Invalid user' });
+        }
+
         const watchlist = await prisma.watchListItem.findMany({
             where: { userId },
-            include: { movie: true }
+            include: { movie: { select: RECOMMENDATION_MOVIE_SELECT } },
         });
-        
-        const excludedTmdbIds = watchlist.map(item => item.movie.tmdbId).filter(Boolean);
+
+        const excludedTmdbIds = watchlist.map((item) => item.movie.tmdbId).filter((id) => id != null);
         const watchedGenres = new Set();
         
         watchlist.forEach(item => {
@@ -193,9 +264,12 @@ export const getSurpriseMe = (prisma) => async (req, res) => {
 
         const targetGenreId = reverseGenreMap[pickKey];
 
-        const recs = await discoverRecommendations([targetGenreId], [], excludedTmdbIds);
+        let recs = await discoverRecommendations([targetGenreId], [], excludedTmdbIds);
         if (recs.length === 0) {
-           return res.status(404).json({ error: "Could not find a surprise" });
+            recs = await discoverRecommendations([targetGenreId], [], excludedTmdbIds, { relaxed: true });
+        }
+        if (recs.length === 0) {
+            return res.status(404).json({ error: 'Could not find a surprise' });
         }
 
         // Pick one completely random movie from the page of results
