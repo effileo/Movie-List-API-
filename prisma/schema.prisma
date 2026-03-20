@@ -147,6 +147,7 @@ model movie{
   Overview    String?
   posterPath  String?
   backdropPath String?
+  voteAverage Float?
   createdAt   DateTime @default(now())
   createdBy   Int
   //relations

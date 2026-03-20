@@ -106,6 +106,10 @@ export function mapTmdbMovieToDb(tmdbMovie, createdByUserId) {
         year: releaseYear ?? 0,
         genre: genres,
         runTime: tmdbMovie.runtime ?? null,
+        voteAverage:
+            tmdbMovie.vote_average != null && !Number.isNaN(Number(tmdbMovie.vote_average))
+                ? Number(tmdbMovie.vote_average)
+                : null,
         Overview: tmdbMovie.overview ?? null,
         posterPath: tmdbMovie.poster_path ?? null,
         backdropPath: tmdbMovie.backdrop_path ?? null,
