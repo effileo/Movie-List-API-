@@ -132,3 +132,64 @@ export async function fetchMovieVideos(tmdbId) {
     }
     return res.json();
 }
+
+/**
+ * TMDB discover/movie — maps query-style options to dotted parameter names.
+ * @param {Record<string, string|number|undefined|null>} opts
+ */
+export async function fetchDiscoverMovies(opts = {}) {
+    const key = process.env.TMDB_API_KEY;
+    if (!key) throw new Error('TMDB_API_KEY is not set in .env');
+    const page = Math.max(1, parseInt(opts.page, 10) || 1);
+    const params = new URLSearchParams();
+    params.set('api_key', key);
+    params.set('page', String(page));
+    params.set('sort_by', opts.sort_by || 'popularity.desc');
+    params.set('include_adult', opts.include_adult === true || opts.include_adult === 'true' ? 'true' : 'false');
+
+    const pairs = [
+        ['vote_average.gte', opts.vote_average_gte],
+        ['vote_average.lte', opts.vote_average_lte],
+        ['with_runtime.gte', opts.with_runtime_gte],
+        ['with_runtime.lte', opts.with_runtime_lte],
+        ['primary_release_date.gte', opts.primary_release_date_gte],
+        ['primary_release_date.lte', opts.primary_release_date_lte],
+        ['with_genres', opts.with_genres],
+        ['with_cast', opts.with_cast],
+        ['with_crew', opts.with_crew],
+        ['watch_region', opts.watch_region],
+        ['with_watch_monetization_types', opts.with_watch_monetization_types],
+        ['with_watch_providers', opts.with_watch_providers],
+    ];
+    for (const [k, v] of pairs) {
+        if (v != null && v !== '') params.set(k, String(v));
+    }
+
+    const url = `${TMDB_BASE}/discover/movie?${params.toString()}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`TMDB API error ${res.status}: ${text}`);
+    }
+    return res.json();
+}
+
+/**
+ * Search people (for cast/crew picker).
+ */
+export async function searchPersons(query, page = 1) {
+    const key = process.env.TMDB_API_KEY;
+    if (!key) throw new Error('TMDB_API_KEY is not set in .env');
+    const q = String(query || '').trim();
+    if (!q) {
+        return { page: 1, results: [], total_pages: 0, total_results: 0 };
+    }
+    const p = Math.max(1, parseInt(page, 10) || 1);
+    const url = `${TMDB_BASE}/search/person?api_key=${key}&query=${encodeURIComponent(q)}&page=${p}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`TMDB API error ${res.status}: ${text}`);
+    }
+    return res.json();
+}

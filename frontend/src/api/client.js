@@ -62,6 +62,16 @@ export const apiRoutes = {
     trending: (window = 'week', page = 1) => api(`/movies/trending?window=${window}&page=${page}`),
     get: (id) => api(`/movies/${id}`),
     search: (q, page = 1) => api(`/movies/search?q=${encodeURIComponent(q)}&page=${page}`),
+    browse: (params = {}) => {
+      const sp = new URLSearchParams();
+      Object.entries(params).forEach(([k, v]) => {
+        if (v != null && v !== '') sp.set(k, String(v));
+      });
+      const qs = sp.toString();
+      return api(`/movies/browse${qs ? `?${qs}` : ''}`);
+    },
+    searchPerson: (q, page = 1) =>
+      api(`/movies/search/person?q=${encodeURIComponent(q)}&page=${page}`),
     tmdb: (id) => api(`/movies/tmdb/${id}`),
     videos: (id) => api(`/movies/tmdb/${id}/videos`),
     fromTmdb: (tmdbId) => api('/movies/from-tmdb', { method: 'POST', body: JSON.stringify({ tmdbId }) }),

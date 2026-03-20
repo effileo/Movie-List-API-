@@ -1,5 +1,6 @@
 import express from 'express';
-import { fetchMovieById, searchMovies, fetchPopularMovies, fetchTopRatedMovies, fetchTrendingMovies, fetchMovieVideos } from '../services/tmdb.js';
+import { fetchMovieById, searchMovies, fetchPopularMovies, fetchTopRatedMovies, fetchTrendingMovies, fetchMovieVideos, searchPersons } from '../services/tmdb.js';
+import { browseMovies } from '../services/movieBrowse.js';
 import { findOrCreateFromTmdb, listMovies, listFeatured } from '../controllers/moviecontroller.js';
 import { listReviewsByMovie, createOrUpdateReview } from '../controllers/reviewcontroller.js';
 import { listCommentsByMovie, createComment } from '../controllers/commentcontroller.js';
@@ -50,6 +51,30 @@ function movieRoutes(prisma) {
             res.json(data);
         } catch (err) {
             res.status(502).json({ error: err.message || 'Failed to fetch trending movies' });
+        }
+    });
+
+    /** GET /movies/search/person?q= – TMDB person search (cast/crew picker). */
+    router.get('/search/person', async (req, res) => {
+        const q = req.query.q?.trim();
+        if (!q) {
+            return res.json({ page: 1, results: [], total_pages: 0, total_results: 0 });
+        }
+        try {
+            const data = await searchPersons(q, req.query.page);
+            res.json(data);
+        } catch (err) {
+            res.status(502).json({ error: err.message || 'Person search failed' });
+        }
+    });
+
+    /** GET /movies/browse – discover + optional title q (see movieBrowse.js). */
+    router.get('/browse', async (req, res) => {
+        try {
+            const data = await browseMovies(req.query);
+            res.json(data);
+        } catch (err) {
+            res.status(502).json({ error: err.message || 'Browse failed' });
         }
     });
 
