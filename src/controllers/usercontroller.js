@@ -31,52 +31,73 @@ export function getPublicProfile(prisma) {
 export function getWatchlistFeed(prisma) {
     return async (req, res) => {
         const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 20));
+        const me = req.user?.id != null ? Number(req.user.id) : null;
+        const hasMe = me != null && !Number.isNaN(me);
+
+        const select = {
+            id: true,
+            name: true,
+            avatarUrl: true,
+            watchlistPublic: true,
+            updatedAt: true,
+            _count: {
+                select: {
+                    watchListItems: true,
+                    watchlistLikesRecv: true,
+                    watchlistCommentsRecv: true,
+                },
+            },
+            watchListItems: {
+                take: 4,
+                orderBy: { createdAt: 'desc' },
+                include: { movie: { select: { posterPath: true, title: true, genre: true } } },
+            },
+        };
+        if (hasMe) {
+            /** I follow this user (followerId = me, followedId = card user) */
+            select.followers = {
+                where: { followerId: me },
+                select: { status: true },
+                take: 1,
+            };
+            /** This user follows me (followerId = card user, followedId = me) */
+            select.following = {
+                where: { followedId: me },
+                select: { status: true },
+                take: 1,
+            };
+        }
+
         const users = await prisma.user.findMany({
             where: {
                 watchlistPublic: true,
                 watchListItems: { some: {} },
             },
-            select: {
-                id: true,
-                name: true,
-                avatarUrl: true,
-                watchlistPublic: true,
-                updatedAt: true,
-                followers: {
-                  where: { followerId: req.user?.id || 0 },
-                  select: { status: true }
-                },
-                _count: {
-                    select: {
-                        watchListItems: true,
-                        watchlistLikesRecv: true,
-                        watchlistCommentsRecv: true,
-                    },
-                },
-                watchListItems: {
-                    take: 4,
-                    orderBy: { createdAt: 'desc' },
-                    include: { movie: { select: { posterPath: true, title: true, genre: true } } },
-                },
-            },
+            select,
             orderBy: { updatedAt: 'desc' },
             take: limit,
         });
-        const data = users.map((u) => ({
-            id: u.id,
-            name: u.name,
-            avatarUrl: u.avatarUrl,
-            followStatus: (u.followers?.length > 0) ? u.followers[0].status : null,
-            movieCount: u._count.watchListItems,
-            likeCount: u._count.watchlistLikesRecv,
-            commentCount: u._count.watchlistCommentsRecv,
-            updatedAt: u.updatedAt?.toISOString?.() ?? null,
-            previewMovies: u.watchListItems.map((item) => ({
-                posterPath: item.movie.posterPath,
-                title: item.movie.title,
-                genre: item.movie.genre,
-            })),
-        }));
+        const data = users.map((u) => {
+            const myFollow = hasMe && u.followers?.[0]?.status != null ? u.followers[0].status : null;
+            const theirFollow = hasMe && u.following?.[0]?.status != null ? u.following[0].status : null;
+            const isFriend = myFollow === 'ACCEPTED' && theirFollow === 'ACCEPTED';
+            return {
+                id: u.id,
+                name: u.name,
+                avatarUrl: u.avatarUrl,
+                followStatus: myFollow,
+                isFriend,
+                movieCount: u._count.watchListItems,
+                likeCount: u._count.watchlistLikesRecv,
+                commentCount: u._count.watchlistCommentsRecv,
+                updatedAt: u.updatedAt?.toISOString?.() ?? null,
+                previewMovies: u.watchListItems.map((item) => ({
+                    posterPath: item.movie.posterPath,
+                    title: item.movie.title,
+                    genre: item.movie.genre,
+                })),
+            };
+        });
         res.json({ status: 'success', data });
     };
 }

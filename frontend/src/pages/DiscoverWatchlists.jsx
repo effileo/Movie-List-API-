@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { apiRoutes } from '../api/client.js';
 
@@ -68,14 +68,31 @@ export default function DiscoverWatchlists() {
   const [error, setError] = useState('');
   const [activeTag, setActiveTag] = useState(null);
 
-  useEffect(() => {
-    setLoading(true);
+  const loadFeed = useCallback((opts = { silent: false }) => {
+    if (!opts.silent) setLoading(true);
     apiRoutes.users
       .watchlistFeed(50)
-      .then((res) => setFeed(res.data ?? []))
-      .catch((err) => setError(err.message || 'Failed to load feed'))
-      .finally(() => setLoading(false));
+      .then((res) => {
+        setFeed(res.data ?? []);
+        setError('');
+      })
+      .catch((err) => {
+        if (!opts.silent) setError(err.message || 'Failed to load feed');
+      })
+      .finally(() => {
+        if (!opts.silent) setLoading(false);
+      });
   }, []);
+
+  useEffect(() => {
+    loadFeed({ silent: false });
+  }, [loadFeed]);
+
+  useEffect(() => {
+    const onRefetch = () => loadFeed({ silent: true });
+    window.addEventListener('discover:feed:refetch', onRefetch);
+    return () => window.removeEventListener('discover:feed:refetch', onRefetch);
+  }, [loadFeed]);
 
   // Filter feed based on activeTag and hide current user
   const filteredFeed = useMemo(() => {

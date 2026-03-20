@@ -213,6 +213,17 @@
   color: #fff;
 }
 
+.discover-card-header .follow-btn.friend {
+  border-color: rgba(52, 211, 153, 0.45);
+  background: rgba(16, 185, 129, 0.15);
+  color: #a7f3d0;
+}
+
+.discover-card-header .follow-btn.friend:hover {
+  background: rgba(16, 185, 129, 0.28);
+  color: #ecfdf5;
+}
+
 /* ── Card body (poster strip + caption) ── */
 .discover-card-body-link {
   text-decoration: none;

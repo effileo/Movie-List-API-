@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { UserPlusIcon, UserCheckIcon, SettingsIcon, Loader2Icon } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { UserPlusIcon, UserCheckIcon, SettingsIcon, Loader2Icon, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { apiRoutes } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -9,9 +9,14 @@ export default function UserCardHeader({ user }) {
   const { user: currentUser } = useAuth();
   const { showToast } = useToast();
   
-  // followStatus: null (not following), PENDING, or ACCEPTED
   const [status, setStatus] = useState(user.followStatus || null);
+  const [isFriend, setIsFriend] = useState(!!user.isFriend);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setStatus(user.followStatus || null);
+    setIsFriend(!!user.isFriend);
+  }, [user.id, user.followStatus, user.isFriend]);
 
   const isSelf =
     currentUser != null &&
@@ -37,17 +42,28 @@ export default function UserCardHeader({ user }) {
 
     // Optimistic Update
     const previousStatus = status;
+    const previousFriend = isFriend;
     const isNowFollowing = !status;
-    
+
     setLoading(true);
     setStatus(isNowFollowing ? 'PENDING' : null);
-    
+    if (!isNowFollowing) setIsFriend(false);
+
     try {
       const res = await apiRoutes.users.follow(user.id);
-      setStatus(res.statusText === 'pending' ? 'PENDING' : null);
-      showToast(res.statusText === 'pending' ? `Follow request sent to ${user.name}!` : `Unfollowed ${user.name}.`);
+      if (res.statusText === 'pending') {
+        setStatus('PENDING');
+        setIsFriend(false);
+        showToast(`Follow request sent to ${user.name}!`);
+      } else {
+        setStatus(null);
+        setIsFriend(false);
+        showToast(`Unfollowed ${user.name}.`);
+      }
+      window.dispatchEvent(new CustomEvent('discover:feed:refetch'));
     } catch (err) {
       setStatus(previousStatus);
+      setIsFriend(previousFriend);
       showToast(err.message || 'Failed to update follow status.', 'error');
     } finally {
       setLoading(false);
@@ -88,20 +104,23 @@ export default function UserCardHeader({ user }) {
           <span>Edit</span>
         </Link>
       ) : (
-        <button 
-          className={`follow-btn ${status ? 'following' : ''} ${loading ? 'opacity-50' : ''}`} 
+        <button
+          className={`follow-btn ${isFriend ? 'friend' : ''} ${status ? 'following' : ''} ${loading ? 'opacity-50' : ''}`}
           onClick={handleFollow}
           disabled={loading}
+          title={isFriend ? 'Friends — click to unfollow' : undefined}
         >
           {loading ? (
             <Loader2Icon size={16} className="animate-spin" />
+          ) : isFriend ? (
+            <Users size={16} />
           ) : status === 'ACCEPTED' ? (
             <UserCheckIcon size={16} />
           ) : (
             <UserPlusIcon size={16} />
           )}
           <span>
-            {status === 'ACCEPTED' ? 'Following' : status === 'PENDING' ? 'Requested' : 'Follow'}
+            {isFriend ? 'Friend' : status === 'ACCEPTED' ? 'Following' : status === 'PENDING' ? 'Requested' : 'Follow'}
           </span>
         </button>
       )}

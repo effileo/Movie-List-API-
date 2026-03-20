@@ -9,6 +9,7 @@ import {
 import { getWatchlistLikes, toggleWatchlistLike } from '../controllers/watchlistLikeController.js';
 import { getRecommendations, getSurpriseMe } from '../controllers/recommendationController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import optionalAuthMiddleware from '../middleware/optionalAuthMiddleware.js';
 import { validateRequest } from '../middleware/validateRequest.js';
 import { watchlistCommentSchema } from '../validators/watchlistValidators.js';
 
@@ -18,8 +19,8 @@ function userRoutes(prisma) {
     /** Global activity feed (must be before /:id) */
     router.get('/feed/activity', getActivityFeed(prisma));
 
-    /** Feed of public watchlists (must be before /:id) */
-    router.get('/feed/watchlists', getWatchlistFeed(prisma));
+    /** Feed of public watchlists (must be before /:id); optional auth enriches follow state */
+    router.get('/feed/watchlists', optionalAuthMiddleware, getWatchlistFeed(prisma));
 
     /** Discoverable genres for filtering */
     router.get('/discover/genres', getTopGenres(prisma));
