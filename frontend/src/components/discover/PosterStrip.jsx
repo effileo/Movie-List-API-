@@ -1,35 +1,45 @@
 import { useState } from 'react';
 import { posterUrl, POSTER_PLACEHOLDER } from '../../api/client';
 
-const POSTER_WIDTH = 44;
-const POSTER_HEIGHT = 66;
-const OVERLAP = 14;
+/** 2:3 posters — larger so artwork reads on Discover cards */
+const MULTI = { w: 100, h: 150, overlap: 38 };
+const SINGLE = { w: 140, h: 210, overlap: 0 };
 
 /**
- * Horizontal strip of up to 4 overlapping poster thumbnails. +X badge if more.
- * Shows pulsing skeleton while images load to prevent layout shift.
+ * Overlapping poster fan (multi) or one hero poster (single).
  */
 export default function PosterStrip({ movies = [], movieCount = 0, loading = false }) {
   const [loadedCount, setLoadedCount] = useState(0);
   const display = (movies || []).slice(0, 4);
   const extra = Math.max(0, (movieCount || display.length) - display.length);
+  const isSingle = !loading && display.length === 1;
+  const { w: POSTER_WIDTH, h: POSTER_HEIGHT, overlap: OVERLAP } = isSingle ? SINGLE : MULTI;
 
   const handleLoad = () => {
     setLoadedCount((c) => Math.min(c + 1, display.length));
   };
 
+  const posterSrc = (path) => {
+    const u = posterUrl(path);
+    if (u) return u;
+    return POSTER_PLACEHOLDER;
+  };
+
   if (loading) {
     return (
       <div className="poster-strip poster-strip-skeleton" aria-hidden>
-        <div className="poster-strip-inner">
+        <div
+          className="poster-strip-inner poster-strip-inner--multi"
+          style={{ minHeight: MULTI.h + 16 }}
+        >
           {[0, 1, 2, 3].map((i) => (
             <div
               key={i}
               className="poster-strip-poster poster-strip-poster-placeholder"
               style={{
-                width: POSTER_WIDTH,
-                height: POSTER_HEIGHT,
-                marginLeft: i === 0 ? 0 : -OVERLAP,
+                width: MULTI.w,
+                height: MULTI.h,
+                marginLeft: i === 0 ? 0 : -MULTI.overlap,
               }}
             />
           ))}
@@ -41,8 +51,11 @@ export default function PosterStrip({ movies = [], movieCount = 0, loading = fal
   const allLoaded = display.length === 0 || loadedCount >= display.length;
 
   return (
-    <div className={`poster-strip ${!allLoaded ? 'poster-strip-loading' : ''}`}>
-      <div className="poster-strip-inner">
+    <div className={`poster-strip ${!allLoaded ? 'poster-strip-loading' : ''} ${isSingle ? 'poster-strip--single' : 'poster-strip--multi'}`}>
+      <div
+        className={`poster-strip-inner ${isSingle ? 'poster-strip-inner--single' : 'poster-strip-inner--multi'}`}
+        style={{ minHeight: POSTER_HEIGHT + (isSingle ? 24 : 20) }}
+      >
         {display.length === 0 ? (
           <div
             className="poster-strip-poster poster-strip-poster-placeholder"
@@ -61,10 +74,16 @@ export default function PosterStrip({ movies = [], movieCount = 0, loading = fal
               }}
             >
               <img
-                src={posterUrl(movie?.posterPath) || POSTER_PLACEHOLDER}
+                src={posterSrc(movie?.posterPath)}
                 alt={movie?.title ?? ''}
                 loading="lazy"
+                decoding="async"
                 onLoad={handleLoad}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = POSTER_PLACEHOLDER;
+                  handleLoad();
+                }}
               />
             </div>
           ))
@@ -73,9 +92,9 @@ export default function PosterStrip({ movies = [], movieCount = 0, loading = fal
           <div
             className="poster-strip-more"
             style={{
-              width: POSTER_WIDTH,
-              height: POSTER_HEIGHT,
-              marginLeft: display.length > 0 ? -OVERLAP : 0,
+              width: Math.min(POSTER_WIDTH, 88),
+              height: Math.min(POSTER_HEIGHT, 132),
+              marginLeft: display.length > 0 ? -Math.min(OVERLAP, 28) : 0,
               zIndex: 0,
             }}
           >

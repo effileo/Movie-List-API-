@@ -7,7 +7,8 @@ import UserCardHeader from './UserCardHeader';
 import { apiRoutes } from '../../api/client';
 import { useToast } from '../ui/ToastProvider';
 
-const CARD_MIN_HEIGHT = 320;
+/** Room for large poster strip + caption + link */
+const CARD_BODY_MIN = 280;
 
 export default function WatchlistCard({ watchlist, loading = false, currentUserId = null }) {
   const { showToast } = useToast();
@@ -81,7 +82,7 @@ export default function WatchlistCard({ watchlist, loading = false, currentUserI
       </header>
 
       <Link to={`/users/${watchlist?.id}/watchlist`} className="discover-card-body-link">
-        <div className="discover-card-body" style={{ minHeight: CARD_MIN_HEIGHT - 140 }}>
+        <div className="discover-card-body" style={{ minHeight: CARD_BODY_MIN }}>
           <PosterStrip
             movies={watchlist?.previewMovies}
             movieCount={watchlist?.movieCount ?? 0}
