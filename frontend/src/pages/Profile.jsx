@@ -9,6 +9,7 @@ import {
   LogOut,
   Pencil,
   User,
+  Camera,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../components/ui/ToastProvider.jsx';
@@ -27,6 +28,52 @@ function formatJoined(iso) {
   }
 }
 
+const MAX_AVATAR_FILE_BYTES = 1.5 * 1024 * 1024;
+const MAX_AVATAR_DATA_URL_LEN = 550_000;
+
+/** Resize to JPEG data URL for storage in avatarUrl (matches API validator). */
+function fileToResizedJpegDataUrl(file, maxSide = 400, quality = 0.88) {
+  return new Promise((resolve, reject) => {
+    if (!file?.type?.startsWith('image/')) {
+      reject(new Error('Please choose an image file'));
+      return;
+    }
+    const blobUrl = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(blobUrl);
+      try {
+        const w = img.naturalWidth;
+        const h = img.naturalHeight;
+        if (!w || !h) {
+          reject(new Error('Could not read this image'));
+          return;
+        }
+        const scale = Math.min(1, maxSide / Math.max(w, h));
+        const cw = Math.max(1, Math.round(w * scale));
+        const ch = Math.max(1, Math.round(h * scale));
+        const canvas = document.createElement('canvas');
+        canvas.width = cw;
+        canvas.height = ch;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Could not process image'));
+          return;
+        }
+        ctx.drawImage(img, 0, 0, cw, ch);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      } catch (e) {
+        reject(e instanceof Error ? e : new Error('Could not process image'));
+      }
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(blobUrl);
+      reject(new Error('Could not load image'));
+    };
+    img.src = blobUrl;
+  });
+}
+
 export default function Profile() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -40,6 +87,7 @@ export default function Profile() {
   const [form, setForm] = useState({ name: '', bio: '', avatarUrl: '' });
   const [saving, setSaving] = useState(false);
   const [savingPrivacy, setSavingPrivacy] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   const targetId = id || me?.id;
 
@@ -112,6 +160,39 @@ export default function Profile() {
     showToast('Logged out successfully');
   }
 
+  async function handleAvatarFileInput(e, mode) {
+    const input = e.target;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file || !isOwn) return;
+    if (file.size > MAX_AVATAR_FILE_BYTES) {
+      showToast('Image is too large (max about 1.5 MB)', 'error');
+      return;
+    }
+    setUploadingAvatar(true);
+    setError('');
+    try {
+      const dataUrl = await fileToResizedJpegDataUrl(file);
+      if (dataUrl.length > MAX_AVATAR_DATA_URL_LEN) {
+        showToast('Image is still too large — try a smaller photo.', 'error');
+        return;
+      }
+      if (mode === 'form') {
+        setForm((f) => ({ ...f, avatarUrl: dataUrl }));
+        showToast('Photo added — click Save to apply');
+        return;
+      }
+      const { data } = await apiRoutes.auth.updateProfile({ avatarUrl: dataUrl });
+      setProfile((p) => (p ? { ...p, ...data, _count: p._count } : data));
+      await loadMe();
+      showToast('Profile photo updated');
+    } catch (err) {
+      showToast(err.message || 'Could not update photo', 'error');
+    } finally {
+      setUploadingAvatar(false);
+    }
+  }
+
   if (authLoading || (targetId && loading)) {
     return <div className="page-center profile-loading">Loading…</div>;
   }
@@ -141,13 +222,44 @@ export default function Profile() {
   return (
     <div className="profile-page">
       <header className="profile-hero">
-        {displayUser?.avatarUrl ? (
-          <img src={displayUser.avatarUrl} alt="" className="profile-avatar" />
-        ) : (
-          <div className="profile-avatar placeholder" aria-hidden>
-            <User className="profile-avatar-icon" strokeWidth={1.25} />
-          </div>
-        )}
+        <div className="profile-avatar-column">
+          {displayUser?.avatarUrl ? (
+            <>
+              <img src={displayUser.avatarUrl} alt="" className="profile-avatar" />
+              {isOwn && !editMode && (
+                <label className="profile-avatar-change">
+                  <span>{uploadingAvatar ? 'Uploading…' : 'Change photo'}</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="profile-file-input-overlay"
+                    disabled={uploadingAvatar}
+                    onChange={(e) => handleAvatarFileInput(e, 'save')}
+                  />
+                </label>
+              )}
+            </>
+          ) : isOwn && !editMode ? (
+            <label
+              className={`profile-avatar profile-avatar-upload placeholder${uploadingAvatar ? ' is-busy' : ''}`}
+              aria-label={uploadingAvatar ? 'Uploading photo' : 'Add profile photo'}
+            >
+              <Camera className="profile-avatar-camera" strokeWidth={1.5} aria-hidden />
+              <span className="profile-avatar-upload-text">{uploadingAvatar ? 'Uploading…' : 'Add photo'}</span>
+              <input
+                type="file"
+                accept="image/*"
+                className="profile-avatar-file-input"
+                disabled={uploadingAvatar}
+                onChange={(e) => handleAvatarFileInput(e, 'save')}
+              />
+            </label>
+          ) : (
+            <div className="profile-avatar placeholder" aria-hidden>
+              <User className="profile-avatar-icon" strokeWidth={1.25} />
+            </div>
+          )}
+        </div>
         <div className="profile-hero-main">
           {editMode && isOwn ? (
             <form onSubmit={handleSaveProfile} className="profile-form">
@@ -157,11 +269,28 @@ export default function Profile() {
                 placeholder="Display name"
                 required
               />
+              <div className="profile-avatar-file-row">
+                <label className="profile-btn profile-btn-ghost profile-file-upload-btn">
+                  <Camera className="w-4 h-4" aria-hidden />
+                  {uploadingAvatar ? 'Processing…' : 'Upload photo'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="profile-file-input-overlay"
+                    disabled={uploadingAvatar || saving}
+                    onChange={(e) => handleAvatarFileInput(e, 'form')}
+                  />
+                </label>
+                <span className="profile-file-hint muted">from your device · applied when you Save</span>
+              </div>
               <input
-                value={form.avatarUrl}
+                value={form.avatarUrl.startsWith('data:') ? '' : form.avatarUrl}
                 onChange={(e) => setForm((f) => ({ ...f, avatarUrl: e.target.value }))}
-                placeholder="Avatar image URL"
+                placeholder="Or paste an image URL (https://…)"
               />
+              {form.avatarUrl.startsWith('data:') && (
+                <p className="profile-pending-photo muted">New photo ready — save to keep it, or upload another.</p>
+              )}
               <textarea
                 value={form.bio}
                 onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))}

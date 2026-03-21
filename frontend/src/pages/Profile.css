@@ -51,6 +51,115 @@
   color: rgba(255, 255, 255, 0.45);
 }
 
+.profile-avatar-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+}
+
+.profile-avatar-upload {
+  flex-direction: column;
+  gap: 0.35rem;
+  position: relative;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-avatar-upload:hover:not(.is-busy) {
+  border-color: rgba(225, 29, 72, 0.5);
+  box-shadow: 0 0 0 1px rgba(225, 29, 72, 0.3), 0 10px 26px rgba(0, 0, 0, 0.3);
+}
+
+.profile-avatar-upload.is-busy {
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.profile-avatar-file-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.profile-avatar-camera {
+  width: 32px;
+  height: 32px;
+  color: rgba(255, 255, 255, 0.92);
+  pointer-events: none;
+}
+
+.profile-avatar-upload-text {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: rgba(255, 255, 255, 0.9);
+  pointer-events: none;
+  text-align: center;
+  line-height: 1.25;
+  max-width: 104px;
+}
+
+.profile-avatar-change {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 1.35rem;
+  padding: 0 0.15rem;
+  font-size: 0.8rem;
+  color: #9ec1ff;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.profile-avatar-change:hover span {
+  color: #c4d8ff;
+}
+
+.profile-file-input-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 0;
+}
+
+.profile-file-upload-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-file-upload-btn .w-4 {
+  pointer-events: none;
+}
+
+.profile-avatar-file-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.profile-file-hint {
+  font-size: 0.78rem;
+}
+
+.profile-pending-photo {
+  font-size: 0.8rem;
+  margin: -0.35rem 0 0.65rem;
+}
+
 .profile-title-row {
   display: flex;
   flex-wrap: wrap;
