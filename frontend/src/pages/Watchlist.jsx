@@ -499,7 +499,7 @@ export default function Watchlist() {
               <Plus className="h-8 w-8" strokeWidth={2} />
             </div>
             <p className="text-cinematic-muted text-base max-w-md leading-relaxed">
-              Your cinematic journey starts here. Add a movie to begin.
+              Your cinematic journey starts here. Add your favorite movies to begin.
             </p>
             <Link
               to="/search"
