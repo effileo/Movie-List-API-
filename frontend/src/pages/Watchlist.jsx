@@ -456,7 +456,7 @@ export default function Watchlist() {
         <header className="mb-10">
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white drop-shadow-sm">My watchlist</h1>
           <p className="mt-2 text-sm text-cinematic-muted max-w-xl">
-            Curate, sort, and filter your queue - a premium view of everything you plan to watch.
+             Sort, and filter your queue - a premium view of everything you plan to watch.
           </p>
         </header>
 
