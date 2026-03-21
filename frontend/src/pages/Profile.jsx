@@ -362,7 +362,7 @@ export default function Profile() {
                 favorite eras, and more.
               </p>
             ) : (
-              <p className="profile-bio profile-bio-placeholder muted">No bio yet.</p>
+              <p className="profile-bio profile-bio-placeholder muted">No bio yet. Add your favorite genres, directors, and more.</p>
             )}
           </section>
 
