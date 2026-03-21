@@ -359,7 +359,7 @@ export default function Profile() {
             ) : isOwn ? (
               <p className="profile-bio profile-bio-placeholder">
                 You haven&apos;t added a bio yet. Use <strong>Edit profile</strong> to share your taste,
-                favorite eras, or what you&apos;re into lately.
+                favorite eras, and more.
               </p>
             ) : (
               <p className="profile-bio profile-bio-placeholder muted">No bio yet.</p>
