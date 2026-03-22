@@ -380,7 +380,7 @@ export default function Profile() {
                   <Link to="/watchlist" className="profile-shortcut">
                     <Bookmark className="profile-shortcut-icon" aria-hidden />
                     <span className="profile-shortcut-label">Watchlist</span>
-                    <span className="profile-shortcut-desc">Plan, track, and sort what you want to watch</span>
+                    <span className="profile-shortcut-desc">Your personal list of movies to watch</span>
                   </Link>
                 </li>
                 <li>
