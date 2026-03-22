@@ -236,7 +236,7 @@ export default function MovieDetail() {
       </div>
 
       {/* Reviews List */}
-      <section>
+      <section id="reviews">
         <h2 className="text-xl font-bold text-white mb-4">Reviews</h2>
         <div className="flex flex-col gap-3">
           <AnimatePresence>

@@ -51,6 +51,7 @@ export const apiRoutes = {
     watchlistLikes: (id) => api(`/users/${id}/watchlist/likes`),
     toggleWatchlistLike: (id) => api(`/users/${id}/watchlist/like`, { method: 'POST' }),
     preview: (id) => api(`/users/${id}/preview`),
+    directorsTimeline: (id) => api(`/users/${id}/directors-timeline`),
     recommendations: (genres = '') => api(`/users/me/recommendations${genres ? `?genres=${genres}` : ''}`),
     surpriseMe: () => api(`/users/me/recommendations/surprise`),
   },

@@ -1,5 +1,6 @@
 import express from 'express';
 import { getPublicProfile, getPublicWatchlist, getWatchlistFeed, getUserPreview, toggleFollow, getTopGenres, getNotifications, markNotificationsAsRead, markNotificationRead, respondToFollowRequest } from '../controllers/usercontroller.js';
+import { getDirectorsTimeline } from '../controllers/directorsTimelineController.js';
 import { getActivityFeed } from '../controllers/feedcontroller.js';
 import {
     listWatchlistComments,
@@ -47,6 +48,9 @@ function userRoutes(prisma) {
 
     /** User preview for hover popovers */
     router.get('/:id/preview', getUserPreview(prisma));
+
+    /** Director's Cut timeline (public profile only for non-owner; optional auth for self) */
+    router.get('/:id/directors-timeline', optionalAuthMiddleware, getDirectorsTimeline(prisma));
 
     router.get('/:id/watchlist', getPublicWatchlist(prisma));
     router.get('/:id', getPublicProfile(prisma));

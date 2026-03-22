@@ -14,6 +14,7 @@ import {
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../components/ui/ToastProvider.jsx';
 import { apiRoutes } from '../api/client.js';
+import DirectorsCutTimeline from '../components/profile/DirectorsCutTimeline.jsx';
 import './Profile.css';
 
 function formatJoined(iso) {
@@ -365,6 +366,11 @@ export default function Profile() {
               <p className="profile-bio profile-bio-placeholder muted">No bio yet. Add your favorite genres, directors, and more.</p>
             )}
           </section>
+
+          <DirectorsCutTimeline
+            userId={displayUser?.id}
+            enabled={Boolean(!editMode && displayUser?.id && (isOwn || watchlistPublic))}
+          />
 
           {isOwn && (
             <section className="profile-section" aria-labelledby="profile-activity-heading">
