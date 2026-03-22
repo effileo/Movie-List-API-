@@ -8,7 +8,7 @@ import movieRoutes from './routes/movieRoutes.js';
 import { config } from 'dotenv';
 import { connectDB, disconnectDB } from './config/db.js';
 import { validateEnv } from './config/env.js';
-import authRoutes from './routes/authRoutes.js';
+import createAuthRoutes from './routes/authRoutes.js';
 import prisma from './config/db.js';
 import watchlistRoutes from './routes/watchlistRoutes.js';
 import userRoutes from './routes/userRoutes.js';
@@ -34,7 +34,7 @@ app.use('/auth', rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 30,
     message: { error: 'Too many attempts, try again later' },
-}), authRoutes);
+}), createAuthRoutes(prisma));
 
 app.use('/movies', movieRoutes(prisma));
 app.use('/watchlist', watchlistRoutes(prisma));

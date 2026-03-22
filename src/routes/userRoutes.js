@@ -1,6 +1,7 @@
 import express from 'express';
 import { getPublicProfile, getPublicWatchlist, getWatchlistFeed, getUserPreview, toggleFollow, getTopGenres, getNotifications, markNotificationsAsRead, markNotificationRead, respondToFollowRequest } from '../controllers/usercontroller.js';
 import { getDirectorsTimeline } from '../controllers/directorsTimelineController.js';
+import { getUserCinePersona } from '../controllers/cinePersonaController.js';
 import { getActivityFeed } from '../controllers/feedcontroller.js';
 import {
     listWatchlistComments,
@@ -51,6 +52,9 @@ function userRoutes(prisma) {
 
     /** Director's Cut timeline (public profile only for non-owner; optional auth for self) */
     router.get('/:id/directors-timeline', optionalAuthMiddleware, getDirectorsTimeline(prisma));
+
+    /** Cached Cine-Persona (same visibility as timeline) */
+    router.get('/:id/cine-persona', optionalAuthMiddleware, getUserCinePersona(prisma));
 
     router.get('/:id/watchlist', getPublicWatchlist(prisma));
     router.get('/:id', getPublicProfile(prisma));

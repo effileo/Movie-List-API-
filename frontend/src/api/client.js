@@ -32,6 +32,7 @@ export const apiRoutes = {
     logout: () => api('/auth/logout', { method: 'POST' }),
     me: () => api('/auth/me'),
     updateProfile: (body) => api('/auth/me', { method: 'PATCH', body: JSON.stringify(body) }),
+    refreshCinePersona: () => api('/auth/cine-persona/refresh', { method: 'POST' }),
   },
   users: {
     get: (id) => api(`/users/${id}`),
@@ -52,6 +53,7 @@ export const apiRoutes = {
     toggleWatchlistLike: (id) => api(`/users/${id}/watchlist/like`, { method: 'POST' }),
     preview: (id) => api(`/users/${id}/preview`),
     directorsTimeline: (id) => api(`/users/${id}/directors-timeline`),
+    cinePersona: (id) => api(`/users/${id}/cine-persona`),
     recommendations: (genres = '') => api(`/users/me/recommendations${genres ? `?genres=${genres}` : ''}`),
     surpriseMe: () => api(`/users/me/recommendations/surprise`),
   },

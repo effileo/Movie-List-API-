@@ -15,6 +15,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../components/ui/ToastProvider.jsx';
 import { apiRoutes } from '../api/client.js';
 import DirectorsCutTimeline from '../components/profile/DirectorsCutTimeline.jsx';
+import CinePersonaCard from '../components/profile/CinePersonaCard.jsx';
 import './Profile.css';
 
 function formatJoined(iso) {
@@ -366,6 +367,13 @@ export default function Profile() {
               <p className="profile-bio profile-bio-placeholder muted">No bio yet. Add your favorite genres, directors, and more.</p>
             )}
           </section>
+
+          <CinePersonaCard
+            userId={displayUser?.id}
+            userName={displayUser?.name}
+            isOwn={isOwn}
+            enabled={Boolean(!editMode && displayUser?.id && (isOwn || watchlistPublic))}
+          />
 
           <DirectorsCutTimeline
             userId={displayUser?.id}

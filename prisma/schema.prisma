@@ -39,6 +39,20 @@ model user{
   cineMatchInvitesSent cineMatchInvite[] @relation("CineMatchInviteFrom")
   cineMatchInvitesRecv cineMatchInvite[] @relation("CineMatchInviteTo")
   cineMatchSessionSwipes cineMatchSessionSwipe[]
+  cinePersona            cinePersona?
+}
+
+model cinePersona {
+  userId            Int      @id
+  title             String
+  bio               String   @db.Text
+  auraGenre         String
+  radar             Json
+  classics          Json
+  sourceFingerprint String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              user     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model cineMatchLike {
