@@ -12,7 +12,7 @@ export default function Home() {
     <div className="home-page">
       <div className="home-hero">
         <h1>Movie Watchlist</h1>
-        <p>Search movies, add them to your watchlist, and track what you want to watch.</p>
+        <p>Search movies, add them to your watchlist, watch with your friends and track what you want to watch. </p>
       </div>
       <div className="home-actions">
         {user ? (
