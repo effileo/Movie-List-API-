@@ -408,7 +408,7 @@ export default function Profile() {
                   <Link to="/discover" className="profile-shortcut">
                     <Compass className="profile-shortcut-icon" aria-hidden />
                     <span className="profile-shortcut-label">Discover</span>
-                    <span className="profile-shortcut-desc">Browse public lists from the community</span>
+                    <span className="profile-shortcut-desc"> Browse public lists from the community</span>
                   </Link>
                 </li>
               </ul>
@@ -456,8 +456,7 @@ export default function Profile() {
                 <div>
                   <p className="profile-setting-label">Public watchlist</p>
                   <p className="profile-setting-desc">
-                    When on, your list appears in Discover and anyone with your link can view, like, and
-                    comment.
+                    When your watchlist is public, it appears in Discover and anyone with your link can view, like, and comment.
                   </p>
                 </div>
                 <label className="profile-toggle">
