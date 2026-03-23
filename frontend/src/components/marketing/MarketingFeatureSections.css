@@ -19,6 +19,48 @@
     #020202;
 }
 
+/* Vault: single column, readable measure — not a skinny glass card beside the strip */
+.marketing-section-vault {
+  padding-top: clamp(3.5rem, 8vw, 6rem);
+}
+
+.marketing-vault-stack {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 5vw, 3.25rem);
+}
+
+.marketing-vault-copy {
+  width: 100%;
+  max-width: 38rem;
+  margin-inline: auto;
+  text-align: center;
+  padding-inline: 0.25rem;
+}
+
+@media (min-width: 768px) {
+  .marketing-vault-copy {
+    text-align: left;
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+}
+
+.marketing-headline-vault {
+  margin-bottom: 1rem;
+}
+
+.marketing-vault-strip-wrap {
+  width: 100%;
+  min-height: 260px;
+}
+
+@media (min-width: 768px) {
+  .marketing-vault-strip-wrap {
+    min-height: 300px;
+  }
+}
+
 .marketing-section-inner {
   max-width: 72rem;
   margin: 0 auto;

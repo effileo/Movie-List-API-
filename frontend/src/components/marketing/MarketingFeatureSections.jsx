@@ -190,30 +190,7 @@ export default function MarketingFeatureSections() {
         </motion.div>
       </section>
 
-      {/* 2. 3D Vault — copy left, visual right */}
-      <section className="marketing-section marketing-section-void">
-        <motion.div className="marketing-section-inner" {...revealProps}>
-          <div className="marketing-split marketing-split-reverse">
-            <div className="marketing-split-copy order-2 md:order-1">
-              <div className="marketing-glass-card">
-                <h2 className="marketing-headline">
-                  Build Your Digital{' '}
-                  <span className="text-slate-300">Trophy Room.</span>
-                </h2>
-                <p className="marketing-body">
-                  Collect your cinematic milestones in a stunning 3D Vault that grows with your
-                  movie history.
-                </p>
-              </div>
-            </div>
-            <div className="marketing-split-visual min-h-[280px] md:min-h-[320px]">
-              <VaultCaseStrip />
-            </div>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* 3. Social Pulse — visual left, copy right */}
+      {/* 2. Social Pulse — visual left, copy right */}
       <section className="marketing-section marketing-section-dark">
         <motion.div className="marketing-section-inner" {...revealProps}>
           <div className="marketing-split">
@@ -241,6 +218,26 @@ export default function MarketingFeatureSections() {
                   <HeartIcon className="w-5 h-5 text-cinematic-accent/80" />
                 </div>
               </div>
+            </div>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* 3. 3D Vault — full-width copy, then strip (avoids narrow split column) */}
+      <section className="marketing-section marketing-section-void marketing-section-vault">
+        <motion.div className="marketing-section-inner" {...revealProps}>
+          <div className="marketing-vault-stack">
+            <div className="marketing-vault-copy">
+              <h2 className="marketing-headline marketing-headline-vault text-balance">
+                Build Your Digital <span className="text-slate-300">Trophy Room.</span>
+              </h2>
+              <p className="marketing-body">
+                Collect your cinematic milestones in a stunning 3D Vault that grows with your movie
+                history.
+              </p>
+            </div>
+            <div className="marketing-vault-strip-wrap">
+              <VaultCaseStrip />
             </div>
           </div>
         </motion.div>
