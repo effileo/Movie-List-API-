@@ -161,8 +161,8 @@ export default function ReleaseRadar() {
               Release Radar
             </h1>
             <p className="text-cinematic-muted text-sm mt-2 max-w-xl">
-              Upcoming premieres from TMDB. Save titles to your Anticipated collection and sync release
-              day to Google Calendar.
+              Popular upcoming releases (TMDB popularity, next 18 months). Save titles to Anticipated and
+              sync release day to Google Calendar.
             </p>
           </div>
           {calendarQuery.data && (

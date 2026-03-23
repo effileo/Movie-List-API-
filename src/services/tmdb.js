@@ -150,6 +150,7 @@ export async function fetchDiscoverMovies(opts = {}) {
     const pairs = [
         ['vote_average.gte', opts.vote_average_gte],
         ['vote_average.lte', opts.vote_average_lte],
+        ['vote_count.gte', opts.vote_count_gte],
         ['with_runtime.gte', opts.with_runtime_gte],
         ['with_runtime.lte', opts.with_runtime_lte],
         ['primary_release_date.gte', opts.primary_release_date_gte],
@@ -175,8 +176,8 @@ export async function fetchDiscoverMovies(opts = {}) {
 }
 
 /**
- * Upcoming theatrical releases: discover with primary_release_date strictly after today (UTC).
- * Results sorted by release date ascending.
+ * Upcoming releases with a future primary_release_date (UTC), sorted by TMDB popularity.
+ * Uses a multi-month window so the feed highlights well-known titles, not only the next few days.
  */
 export async function fetchUpcomingMovies(page = 1) {
     const now = new Date();
@@ -187,10 +188,19 @@ export async function fetchUpcomingMovies(page = 1) {
     const primaryReleaseGte = `${y}-${mo}-${da}`;
     const todayStr = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}-${String(now.getUTCDate()).padStart(2, '0')}`;
 
+    const windowEnd = new Date(tomorrow);
+    windowEnd.setUTCMonth(windowEnd.getUTCMonth() + 18);
+    const ye = windowEnd.getUTCFullYear();
+    const me = String(windowEnd.getUTCMonth() + 1).padStart(2, '0');
+    const de = String(windowEnd.getUTCDate()).padStart(2, '0');
+    const primaryReleaseLte = `${ye}-${me}-${de}`;
+
     const data = await fetchDiscoverMovies({
         page,
-        sort_by: 'primary_release_date.asc',
+        sort_by: 'popularity.desc',
         primary_release_date_gte: primaryReleaseGte,
+        primary_release_date_lte: primaryReleaseLte,
+        vote_count_gte: 40,
         include_adult: false,
     });
     const results = (data.results || []).filter(
