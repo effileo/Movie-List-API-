@@ -167,7 +167,7 @@ function SocialPulseFeed() {
 
 export default function MarketingFeatureSections() {
   return (
-    <div className="marketing-features relative z-30">
+    <div id="features" className="marketing-features relative z-30 scroll-mt-24">
       {/* 1. Smart Discovery — visual left, copy right */}
       <section className="marketing-section marketing-section-dark">
         <motion.div className="marketing-section-inner" {...revealProps}>
