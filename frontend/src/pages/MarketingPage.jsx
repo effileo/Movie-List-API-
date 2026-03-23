@@ -121,7 +121,7 @@ export default function MarketingPage() {
             </p>
             <Link
               to="/register"
-              className="inline-flex items-center justify-center px-10 py-4 md:px-12 md:py-5 rounded-full bg-cinematic-accent hover:opacity-92 font-black text-sm md:text-base tracking-widest uppercase transition-opacity shadow-[0_0_40px_-15px_rgba(225,29,72,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinematic-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#050505]"
+              className="inline-flex items-center justify-center px-6 py-2.5 md:px-8 md:py-3 rounded-full bg-cinematic-accent hover:opacity-92 font-bold text-xs md:text-sm tracking-wide uppercase transition-opacity shadow-[0_0_28px_-12px_rgba(225,29,72,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinematic-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#050505]"
             >
               Create free account
             </Link>
