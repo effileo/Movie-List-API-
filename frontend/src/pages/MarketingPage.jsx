@@ -64,17 +64,17 @@ export default function MarketingPage() {
 
               <motion.div
                 {...fadeUp(reduceMotion ? 0 : 0.52)}
-                className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 w-full sm:w-auto"
+                className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2.5 sm:gap-3 w-full sm:w-auto"
               >
                 <Link
                   to="/register"
-                  className="inline-flex items-center justify-center px-10 py-4 md:px-12 md:py-5 rounded-full bg-cinematic-accent text-white font-black text-base md:text-xl tracking-widest uppercase shadow-[0_0_40px_-15px_rgba(225,29,72,0.45)] hover:opacity-92 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinematic-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#050505] transition-opacity"
+                  className="inline-flex items-center justify-center px-6 py-2.5 md:px-8 md:py-3 rounded-full bg-cinematic-accent text-white font-bold text-xs md:text-sm tracking-wide uppercase shadow-[0_0_28px_-12px_rgba(225,29,72,0.45)] hover:opacity-92 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cinematic-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#050505] transition-opacity"
                 >
                   Get started
                 </Link>
                 <Link
                   to="/login"
-                  className="inline-flex items-center justify-center px-10 py-4 md:px-12 md:py-5 rounded-full border border-white/15 bg-white/[0.04] text-white/90 font-semibold text-sm md:text-base tracking-wide hover:bg-white/[0.08] hover:border-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050505] transition-colors"
+                  className="inline-flex items-center justify-center px-6 py-2.5 md:px-8 md:py-3 rounded-full border border-white/15 bg-white/[0.04] text-white/90 font-medium text-xs md:text-sm tracking-wide hover:bg-white/[0.08] hover:border-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050505] transition-colors"
                 >
                   Sign in
                 </Link>
