@@ -16,6 +16,7 @@ export async function api(path, options = {}) {
     ...options,
     headers,
     cache: options.cache ?? 'no-store',
+    signal: options.signal,
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
@@ -30,7 +31,7 @@ export const apiRoutes = {
     register: (body) => api('/auth/register', { method: 'POST', body: JSON.stringify(body) }),
     login: (body) => api('/auth/login', { method: 'POST', body: JSON.stringify(body) }),
     logout: () => api('/auth/logout', { method: 'POST' }),
-    me: () => api('/auth/me'),
+    me: (fetchOpts = {}) => api('/auth/me', fetchOpts),
     updateProfile: (body) => api('/auth/me', { method: 'PATCH', body: JSON.stringify(body) }),
     refreshCinePersona: () => api('/auth/cine-persona/refresh', { method: 'POST' }),
   },
@@ -63,6 +64,7 @@ export const apiRoutes = {
     popular: (page = 1) => api(`/movies/popular?page=${page}`),
     topRated: (page = 1) => api(`/movies/top-rated?page=${page}`),
     trending: (window = 'week', page = 1) => api(`/movies/trending?window=${window}&page=${page}`),
+    upcoming: (page = 1) => api(`/movies/upcoming?page=${page}`),
     get: (id) => api(`/movies/${id}`),
     search: (q, page = 1) => api(`/movies/search?q=${encodeURIComponent(q)}&page=${page}`),
     browse: (params = {}) => {
@@ -100,6 +102,11 @@ export const apiRoutes = {
   },
   feed: {
     activity: (limit = 30) => api(`/users/feed/activity?limit=${limit}`),
+  },
+  calendar: {
+    authUrl: () => api('/calendar/google/auth-url'),
+    status: () => api('/calendar/status'),
+    sync: (body) => api('/calendar/sync', { method: 'POST', body: JSON.stringify(body) }),
   },
   cineMatch: {
     friends: () => api('/cine-match/friends'),

@@ -14,13 +14,19 @@ export function AuthProvider({ children }) {
       setLoading(false);
       return;
     }
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
     try {
-      const { data } = await apiRoutes.auth.me();
+      const { data } = await apiRoutes.auth.me({ signal: controller.signal });
       setUser(data);
-    } catch {
+    } catch (e) {
       localStorage.removeItem('token');
       setUser(null);
+      if (import.meta.env.DEV && e?.name !== 'AbortError') {
+        console.warn('Session check failed:', e?.message || e);
+      }
     } finally {
+      clearTimeout(timeoutId);
       setLoading(false);
     }
   }, []);

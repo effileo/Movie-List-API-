@@ -1,5 +1,5 @@
 import express from 'express';
-import { fetchMovieById, searchMovies, fetchPopularMovies, fetchTopRatedMovies, fetchTrendingMovies, fetchMovieVideos, searchPersons } from '../services/tmdb.js';
+import { fetchMovieById, searchMovies, fetchPopularMovies, fetchTopRatedMovies, fetchTrendingMovies, fetchMovieVideos, searchPersons, fetchUpcomingMovies } from '../services/tmdb.js';
 import { browseMovies } from '../services/movieBrowse.js';
 import { findOrCreateFromTmdb, listMovies, listFeatured } from '../controllers/moviecontroller.js';
 import { listReviewsByMovie, createOrUpdateReview } from '../controllers/reviewcontroller.js';
@@ -51,6 +51,16 @@ function movieRoutes(prisma) {
             res.json(data);
         } catch (err) {
             res.status(502).json({ error: err.message || 'Failed to fetch trending movies' });
+        }
+    });
+
+    /** GET /movies/upcoming?page=1 – TMDB discover: releases after today (Coming Soon). */
+    router.get('/upcoming', async (req, res) => {
+        try {
+            const data = await fetchUpcomingMovies(req.query.page);
+            res.json(data);
+        } catch (err) {
+            res.status(502).json({ error: err.message || 'Failed to fetch upcoming movies' });
         }
     });
 

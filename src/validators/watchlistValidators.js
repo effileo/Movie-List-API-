@@ -4,7 +4,7 @@ import { z } from 'zod';
 export const addToWatchListSchema = z.object({
     movieId: z.string().uuid().optional(),
     tmdbId: z.union([z.number(), z.string().transform(Number)]).optional(),
-    status: z.enum(['PLANNED', 'WATCHING', 'COMPLETED', 'DROPPED']).optional().default('PLANNED'),
+    status: z.enum(['PLANNED', 'WATCHING', 'COMPLETED', 'DROPPED', 'ANTICIPATED']).optional().default('PLANNED'),
     rating: z.number().min(1).max(10).optional(),
     notes: z.string().max(2000).optional(),
 }).refine((data) => data.movieId != null || data.tmdbId != null, {

@@ -16,7 +16,7 @@ import Profile from './pages/Profile.jsx';
 import PublicWatchlist from './pages/PublicWatchlist.jsx';
 import DiscoverWatchlists from './pages/DiscoverWatchlists.jsx';
 import CineVault from './pages/CineVault.jsx';
-import { FilmIcon, SearchIcon, UserIcon, LogOutIcon, ArchiveIcon, BellIcon } from 'lucide-react';
+import { FilmIcon, SearchIcon, UserIcon, LogOutIcon, ArchiveIcon, BellIcon, Radar } from 'lucide-react';
 import { ToastProvider, useToast } from './components/ui/ToastProvider.jsx';
 import NotificationDropdown from './components/notifications/NotificationDropdown.jsx';
 import { NotificationCountProvider, useNotificationCount } from './context/NotificationCountContext.jsx';
@@ -64,6 +64,12 @@ function Nav() {
               <Link to="/watchlist" className="text-cinematic-muted hover:text-white transition-colors">Watchlist</Link>
               <Link to="/vault" className="text-cinematic-muted hover:text-white transition-colors flex items-center gap-1.5">
                 <ArchiveIcon className="w-4 h-4" /> Vault
+              </Link>
+              <Link
+                to="/dashboard?tab=release-radar"
+                className="text-cinematic-muted hover:text-white transition-colors flex items-center gap-2"
+              >
+                <Radar className="w-4 h-4" /> Release Radar
               </Link>
               <Link to="/discover" className="text-cinematic-muted hover:text-white transition-colors">Discover</Link>
               
@@ -117,15 +123,31 @@ const queryClient = new QueryClient({
 // Navigation Route Guard component
 function AuthGuard({ children, requireAuth = true, redirect = "/" }) {
   const { user, loading } = useAuth();
-  
-  if (loading) return null; // Wait to render until auth settles
+
+  if (loading) {
+    return (
+      <div className="min-h-[70vh] flex flex-col items-center justify-center px-6 pt-8">
+        <div
+          className="w-12 h-12 rounded-full border-4 border-cinematic-accent border-t-transparent animate-spin"
+          aria-hidden
+        />
+        <p className="mt-6 text-sm text-cinematic-muted text-center max-w-sm">
+          Loading your session…
+        </p>
+        <p className="mt-2 text-xs text-cinematic-muted/70 text-center max-w-md">
+          If this never finishes, ensure the API server is running (e.g. port 5001) and{' '}
+          <code className="text-white/60">VITE_API_URL</code> matches it.
+        </p>
+      </div>
+    );
+  }
 
   if (requireAuth && !user) {
     return <Navigate to="/login" replace />;
   }
 
   if (!requireAuth && user) {
-     return <Navigate to={redirect} replace />;
+    return <Navigate to={redirect} replace />;
   }
 
   return children;

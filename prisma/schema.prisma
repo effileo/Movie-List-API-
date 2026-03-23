@@ -40,6 +40,8 @@ model user{
   cineMatchInvitesRecv cineMatchInvite[] @relation("CineMatchInviteTo")
   cineMatchSessionSwipes cineMatchSessionSwipe[]
   cinePersona            cinePersona?
+  googleCalendarCredential googleCalendarCredential?
+  googleCalendarSyncs      googleCalendarSync[]
 }
 
 model cinePersona {
@@ -191,6 +193,30 @@ enum WatchListStatus{
   WATCHING
   COMPLETED
   DROPPED
+  ANTICIPATED
+}
+
+/** Google OAuth tokens for Calendar API (one row per user). */
+model googleCalendarCredential {
+  userId       Int      @id
+  accessToken  String   @db.Text
+  refreshToken String   @db.Text
+  expiry       DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/** Tracks TMDB titles synced to Google Calendar (prevents duplicate events). */
+model googleCalendarSync {
+  id        String   @id @default(uuid())
+  userId    Int
+  tmdbId    Int
+  createdAt DateTime @default(now())
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tmdbId])
+  @@index([userId])
 }
 
 model review{

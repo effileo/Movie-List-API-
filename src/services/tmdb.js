@@ -175,6 +175,31 @@ export async function fetchDiscoverMovies(opts = {}) {
 }
 
 /**
+ * Upcoming theatrical releases: discover with primary_release_date strictly after today (UTC).
+ * Results sorted by release date ascending.
+ */
+export async function fetchUpcomingMovies(page = 1) {
+    const now = new Date();
+    const tomorrow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
+    const y = tomorrow.getUTCFullYear();
+    const mo = String(tomorrow.getUTCMonth() + 1).padStart(2, '0');
+    const da = String(tomorrow.getUTCDate()).padStart(2, '0');
+    const primaryReleaseGte = `${y}-${mo}-${da}`;
+    const todayStr = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}-${String(now.getUTCDate()).padStart(2, '0')}`;
+
+    const data = await fetchDiscoverMovies({
+        page,
+        sort_by: 'primary_release_date.asc',
+        primary_release_date_gte: primaryReleaseGte,
+        include_adult: false,
+    });
+    const results = (data.results || []).filter(
+        (m) => m?.release_date && String(m.release_date) > todayStr,
+    );
+    return { ...data, results };
+}
+
+/**
  * Search people (for cast/crew picker).
  */
 export async function searchPersons(query, page = 1) {

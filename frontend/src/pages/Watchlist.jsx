@@ -128,7 +128,7 @@ function TrailerModal({ open, title, youtubeKey, loading, error, onClose }) {
 }
 
 function WatchProgressBar({ status }) {
-  if (status === 'PLANNED' || status === 'DROPPED') return null;
+  if (status === 'PLANNED' || status === 'DROPPED' || status === 'ANTICIPATED') return null;
   const widthPct = status === 'COMPLETED' ? 100 : 42;
   return (
     <div className="absolute bottom-0 left-0 right-0 h-1 z-[25] bg-black/60 overflow-hidden">
@@ -384,7 +384,7 @@ export default function Watchlist() {
   }, []);
 
   async function handleStartWatchingIfNeeded(item) {
-    if (item.status !== 'PLANNED' && item.status !== 'DROPPED') return;
+    if (item.status !== 'PLANNED' && item.status !== 'DROPPED' && item.status !== 'ANTICIPATED') return;
     try {
       const { data } = await apiRoutes.watchlist.update(item.id, { status: 'WATCHING' });
       setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, ...data } : i)));
@@ -464,7 +464,7 @@ export default function Watchlist() {
           <section className="mb-10 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6 shadow-[0_0_40px_-20px_rgba(0,0,0,0.8)]">
             <h2 className="text-lg font-semibold text-white tracking-tight">Share your watchlist</h2>
             <p className="mt-2 text-sm text-cinematic-muted leading-relaxed max-w-2xl">
-              Post your watchlist so others can view it, like it, and leave comments. When your watchlist is public, anyone with the link can interact with it.
+              Post your watchlist so others can view it, like it, and leave comments. When your watchlist is public, anyone with the link can interact with .
             </p>
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <Link
