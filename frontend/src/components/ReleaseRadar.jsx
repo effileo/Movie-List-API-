@@ -18,7 +18,7 @@ function GoogleCalendarGlyph({ className }) {
 }
 
 function countdownLabel(releaseDate) {
-  if (!releaseDate) return '';
+  if (!releaseDate) return 'Date TBA';
   const target = new Date(`${releaseDate}T12:00:00.000Z`);
   const now = new Date();
   const diffMs = target - now;

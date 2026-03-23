@@ -195,17 +195,33 @@ export async function fetchUpcomingMovies(page = 1) {
     const de = String(windowEnd.getUTCDate()).padStart(2, '0');
     const primaryReleaseLte = `${ye}-${me}-${de}`;
 
-    const data = await fetchDiscoverMovies({
+    // No vote_count floor: unreleased titles often have very few TMDB votes; a floor can return zero hits.
+    let data = await fetchDiscoverMovies({
         page,
         sort_by: 'popularity.desc',
         primary_release_date_gte: primaryReleaseGte,
         primary_release_date_lte: primaryReleaseLte,
-        vote_count_gte: 40,
         include_adult: false,
     });
-    const results = (data.results || []).filter(
-        (m) => m?.release_date && String(m.release_date) > todayStr,
-    );
+
+    let raw = data.results || [];
+    if (!raw.length && (data.total_results === 0 || data.total_results == null)) {
+        data = await fetchDiscoverMovies({
+            page,
+            sort_by: 'popularity.desc',
+            primary_release_date_gte: primaryReleaseGte,
+            include_adult: false,
+        });
+        raw = data.results || [];
+    }
+
+    let results = raw.filter((m) => {
+        if (!m?.release_date) return true;
+        return String(m.release_date) > todayStr;
+    });
+    if (results.length === 0 && raw.length > 0) {
+        results = raw;
+    }
     return { ...data, results };
 }
 
